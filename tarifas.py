@@ -51,12 +51,12 @@ class Sistema:
         tabela_circuitos = pandas.read_csv(arquivo_circuitos, sep=";")
         for _, circuito in tabela_circuitos.iterrows():
             self.circuitos.append(Circuito(
-                numero=int(circuito['Num']), 
-                origem=self.get_barra(circuito['De']), 
-                destino=self.get_barra(circuito['Para']), 
-                r_pu=circuito['r_pu'], 
-                x_pu=circuito['x_pu'], 
-                capacidade=circuito['Capac_MW'], 
+                numero=int(circuito['Num']),
+                origem=self.get_barra(circuito['De']),
+                destino=self.get_barra(circuito['Para']),
+                r_pu=circuito['r_pu'],
+                x_pu=circuito['x_pu'],
+                capacidade=circuito['Capac_MW'],
                 custo_anual=circuito['Custo_Anual_RS']
             ))
 
@@ -87,7 +87,7 @@ class Sistema:
         for circuito in self.circuitos:
             matriz[circuito.origem.posicao, circuito.destino.posicao] = -circuito.susceptancia
             matriz[circuito.destino.posicao, circuito.origem.posicao] = -circuito.susceptancia
-        
+
         for i in range(0, len(matriz)):
             matriz[i,i] = -numpy.sum(matriz[i])
 
@@ -129,6 +129,29 @@ class Sistema:
         DT = numpy.diag(DT)
         return CT.dot(DT).dot(self.construir_matriz_beta())
 
+    def vetor_pc(self):
+        pc = []
+        for barra in self.barras:
+            pc.append(barra.potencia_consumida)
+        return pc
+
+    def soma_pc(self):
+        return numpy.sum(self.vetor_pc())
+
+    #  TODO: reimplementar
+    def vetor_pg_com_ref(self):
+        pg = numpy.zeros(self.numero_barras)
+        for barra in self.barras:
+            if barra.posicao != self.posicao_barra_referencia:
+                pg[barra.posicao] = barra.potencia_gerada
+        soma_sem_ref = numpy.sum(pg)
+        pg[self.posicao_barra_referencia] = self.soma_pc() - soma_sem_ref
+
+        return pg
+
+    #  Vetor F
+    def vetor_fluxo_potencia(self):
+        return self.construir_matriz_beta().dot((cinco_barras.vetor_pg_com_ref() - cinco_barras.vetor_pc()).T)
 
 #-------
 cinco_barras = Sistema(
@@ -137,4 +160,4 @@ cinco_barras = Sistema(
     barra_referencia=1
     )
 
-print(cinco_barras.tarifa_inicial())
+print(cinco_barras.vetor_fluxo_potencia())
