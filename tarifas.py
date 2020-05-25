@@ -28,7 +28,7 @@ class Circuito:
 
 #-------
 class Sistema:
-    def __init__(self, arquivo_barras, arquivo_circuitos, barra_referencia):
+    def __init__(self, arquivo_barras, arquivo_circuitos, barra_referencia, prop_g):
         self.barras = []
         self.circuitos = []
         self._criar_barras(arquivo_barras)
@@ -36,6 +36,7 @@ class Sistema:
         self.numero_barras = len(self.barras)
         self.numero_circuitos = len(self.circuitos)
         self.posicao_barra_referencia = barra_referencia-1
+        self.ro = (100-prop_g) / prop_g
 
     def _criar_barras(self, arquivo_barras):
         tabela_barras = pandas.read_csv(arquivo_barras, sep=";")
@@ -133,13 +134,13 @@ class Sistema:
         pc = []
         for barra in self.barras:
             pc.append(barra.potencia_consumida)
-        return pc
+        return numpy.array(pc)
 
     def soma_pc(self):
         return numpy.sum(self.vetor_pc())
 
     #  TODO: reimplementar
-    def vetor_pg_com_ref(self):
+    def vetor_pg(self):
         pg = numpy.zeros(self.numero_barras)
         for barra in self.barras:
             if barra.posicao != self.posicao_barra_referencia:
@@ -151,13 +152,65 @@ class Sistema:
 
     #  Vetor F
     def vetor_fluxo_potencia(self):
-        return self.construir_matriz_beta().dot((cinco_barras.vetor_pg_com_ref() - cinco_barras.vetor_pc()).T)
+        return self.construir_matriz_beta().dot((cinco_barras.vetor_pg() - cinco_barras.vetor_pc()).T)
+
+    # Ajuste das tarifas iniciais
+    def ajuste_m(self):
+        return - self.tarifa_inicial() .dot((self.ro*self.vetor_pg() + self.vetor_pc()).T) / (self.ro * (numpy.sum(self.vetor_pg()))+self.soma_pc())
+
+    # CTU
+    def calcular_CTU(self):
+        return (self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())).dot((self.vetor_pg() - self.vetor_pc()).T)
+
+    # CTU PG
+    def calcular_CTUPG(self):
+        return (self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())).dot(self.vetor_pg().T)
+
+    # CTU PC
+    def calcular_CTUPC(self):
+        return (self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())).dot((-self.vetor_pc()).T)
+
+    # CTU PG Barras
+    def ctu_PG_barras(self):
+        return ((self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())) * self.vetor_pg())
+
+    # CTU PC Barras
+    def ctu_PC_barras(self):
+        return ((self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())) * (-self.vetor_pc()))
+
+    # CTT
+    def calcular_CTT(self):
+        ctt = 0
+        for circuito in self.circuitos:
+            ctt += circuito.custo_anual
+        return ctt
+    
+    # CTN
+    def calcular_CTN(self):
+        return self.calcular_CTT() - self.calcular_CTU()
+
+    # P
+    def vetor_potencia_ativa(self):
+        p = []
+        for barra in self.barras:
+            p.append(barra.potencia_gerada - barra.potencia_consumida)
+        return p
+
+    # Capacidade de geração instalada
+    def capacidade_instalada(self):
+        c_inst = []
+        for barra in self.barras:
+            c_inst.append(barra.capacidade_instalada)
+        return c_inst
+
+
 
 #-------
 cinco_barras = Sistema(
     arquivo_barras="5B-barras.csv",
     arquivo_circuitos="5B-circuitos.csv",
-    barra_referencia=1
+    barra_referencia=1,
+    prop_g=50
     )
 
-print(cinco_barras.vetor_fluxo_potencia())
+print(cinco_barras.vetor_potencia_ativa())
