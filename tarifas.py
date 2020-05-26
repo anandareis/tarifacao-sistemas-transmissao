@@ -152,31 +152,35 @@ class Sistema:
 
     #  Vetor F
     def vetor_fluxo_potencia(self):
-        return self.construir_matriz_beta().dot((cinco_barras.vetor_pg() - cinco_barras.vetor_pc()).T)
+        return self.construir_matriz_beta().dot(self.vetor_potencia_ativa().T)
 
     # Ajuste das tarifas iniciais
     def ajuste_m(self):
         return - self.tarifa_inicial() .dot((self.ro*self.vetor_pg() + self.vetor_pc()).T) / (self.ro * (numpy.sum(self.vetor_pg()))+self.soma_pc())
 
+    # TARCTU
+    def tar_ctu(self):
+        return self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())
+
     # CTU
     def calcular_CTU(self):
-        return (self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())).dot((self.vetor_pg() - self.vetor_pc()).T)
+        return self.tar_ctu().dot((self.vetor_pg() - self.vetor_pc()).T)
 
     # CTU PG
     def calcular_CTUPG(self):
-        return (self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())).dot(self.vetor_pg().T)
+        return self.tar_ctu().dot(self.vetor_pg().T)
 
     # CTU PC
     def calcular_CTUPC(self):
-        return (self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())).dot((-self.vetor_pc()).T)
+        return self.tar_ctu().dot((-self.vetor_pc()).T)
 
     # CTU PG Barras
     def ctu_PG_barras(self):
-        return ((self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())) * self.vetor_pg())
+        return self.tar_ctu() * self.vetor_pg()
 
     # CTU PC Barras
     def ctu_PC_barras(self):
-        return ((self.tarifa_inicial() + numpy.full_like(self.tarifa_inicial(), self.ajuste_m())) * (-self.vetor_pc()))
+        return self.tar_ctu() * (-self.vetor_pc())
 
     # CTT
     def calcular_CTT(self):
@@ -201,9 +205,32 @@ class Sistema:
         c_inst = []
         for barra in self.barras:
             c_inst.append(barra.capacidade_instalada)
-        return c_inst
+        return numpy.array(c_inst)
 
+    # CTN dos geradores e cargas
+    def ctn_g_c(self):
+        kg = (self.calcular_CTN()/2)/numpy.sum(self.capacidade_instalada())
+        kc = (self.calcular_CTN()/2)/self.soma_pc()
 
+        ctn_g = kg * self.capacidade_instalada()
+        ctn_c = kc * self.vetor_pc()
+
+        return (ctn_g, ctn_c)
+
+    def encargos_finais(self):
+        ctn_g, ctn_c = self.ctn_g_c()
+        total_g = self.ctu_PG_barras() + ctn_g
+        total_c = self.ctu_PC_barras() + ctn_c
+
+        return (total_g, total_c)
+
+    def tarifas_finais(self):
+        final_g, final_c = self.encargos_finais()
+
+        tar_g = numpy.divide(final_g, self.capacidade_instalada(), out=numpy.zeros_like(final_g), where=self.capacidade_instalada()!=0)
+        tar_c = numpy.divide(final_c, self.vetor_pc(), out=numpy.zeros_like(final_c), where=self.vetor_pc()!=0)
+
+        return (tar_g, tar_c)
 
 #-------
 cinco_barras = Sistema(
@@ -211,6 +238,6 @@ cinco_barras = Sistema(
     arquivo_circuitos="5B-circuitos.csv",
     barra_referencia=1,
     prop_g=50
-    )
+)
 
-print(cinco_barras.vetor_potencia_ativa())
+print(cinco_barras.tarifas_finais())
