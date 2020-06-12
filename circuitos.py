@@ -43,3 +43,9 @@ class Circuitos:
 
     def construir_vetor_susceptancias(self):
         return numpy.array([circuito.susceptancia for circuito in self.elementos])
+
+    def construir_vetor_custos_anuais(self):
+        return numpy.array([circuito.custo_anual for circuito in self.elementos])
+
+    def construir_vetor_capacidades(self):
+        return numpy.array([circuito.custo_anual for circuito in self.elementos])
