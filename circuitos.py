@@ -16,6 +16,11 @@ class Circuito:
     def susceptancia(self): # é o 'd' da matriz D
         return self.x_pu/(self.x_pu**2+self.r_pu**2)
 
+    def inverter_origem_destino(self):
+        buffer = self.origem
+        self.origem = self.destino
+        self.destino = buffer
+
 
 class Circuitos:
     def __init__(self, arquivo_circuitos):
@@ -49,3 +54,6 @@ class Circuitos:
 
     def construir_vetor_capacidades(self):
         return numpy.array([circuito.custo_anual for circuito in self.elementos])
+
+    def inverter_origem_destino(self, indice):
+        self.elementos[indice].inverter_origem_destino()
