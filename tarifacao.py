@@ -1,6 +1,9 @@
 import numpy
 
+from sklearn.cluster import KMeans
 from sistema import Sistema
+
+numpy.set_printoptions(suppress=True)
 
 class GeradorDeTarifas:
     def __init__(self, arquivo_barras, arquivo_circuitos, barra_referencia, proporcao_geracao):
@@ -99,12 +102,14 @@ class GeradorDeTarifas:
 
         return valores_corrigidos
 
+    def calcular_k_medias(self, n_clusters):
+        kmeans = KMeans(n_clusters=n_clusters).fit_predict(self.tar_ctu().reshape(-1, 1))
+        return (kmeans)
+
 # ----------------------------------------------------------------
-cinco_barras = GeradorDeTarifas(
-    arquivo_barras="5B-barras.csv",
-    arquivo_circuitos="5B-circuitos.csv",
+sistema_tarifacao = GeradorDeTarifas(
+    arquivo_barras="24B-barras.csv",
+    arquivo_circuitos="24B-circuitos.csv",
     barra_referencia=1,
     proporcao_geracao=50
 )
-
-print(cinco_barras.encargos_finais())
