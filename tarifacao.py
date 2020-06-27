@@ -1,6 +1,9 @@
 import numpy
-
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
 from sklearn.cluster import KMeans
+from sympy import Symbol, lambdify
+
 from sistema import Sistema
 
 numpy.set_printoptions(suppress=True)
@@ -30,7 +33,7 @@ class GeradorDeTarifas:
     # CTU PC
     def calcular_CTUPC(self):
         return self.tar_ctu().dot((-self.sistema.barras.vetor_potencia_consumida()).T)
-    
+
     # CTU PG
     def calcular_CTUPG(self):
         return self.tar_ctu().dot(self.sistema.barras.vetor_potencia_gerada(True).T)
@@ -88,7 +91,7 @@ class GeradorDeTarifas:
     def corrigir_alocacao_negativa(self, valores, tipo_correcao):
         valores_negativos = numpy.where(valores < 0, valores, 0)
         valores_positivos = numpy.where(valores > 0, valores, 0)
-    
+
         montante_negativo = numpy.sum(valores_negativos)
 
         referencia_proporcao = self.sistema.barras.vetor_potencia_gerada(True) if tipo_correcao == 'geracao' else self.sistema.barras.vetor_potencia_consumida()
@@ -96,7 +99,7 @@ class GeradorDeTarifas:
         proporcao = valores_proporcao / numpy.sum(valores_proporcao)
 
         valores_corrigidos = valores_positivos + (montante_negativo*proporcao)
-        
+
         if any(valores_corrigidos < 0):
             return self.corrigir_alocacao_negativa(valores_corrigidos, tipo_correcao)
 
@@ -106,6 +109,50 @@ class GeradorDeTarifas:
         kmeans = KMeans(n_clusters=n_clusters).fit_predict(self.tar_ctu().reshape(-1, 1))
         return (kmeans)
 
+    def cotovelo(self):
+        _figura, eixo1 = plt.subplots()
+        eixo1.set_xlabel('Número de zonas')
+        eixo1.set_ylabel('Erro estimado')
+        eixo2 = eixo1.twinx()
+        eixo2.set_ylabel('Curvatura', color='red')
+        eixo2.tick_params(axis='y', labelcolor='red')
+
+        numero_zonas = range(2, len(self.sistema.barras))
+        eixo_x_continuo = numpy.linspace(2, 23, 200)
+
+        # Erros do K-médias
+        erros = []
+        for n in numero_zonas:
+            kmeans = KMeans(n_clusters=n).fit(self.tar_ctu().reshape(-1,1))
+            erros.append(kmeans.inertia_)
+        eixo1.scatter(numero_zonas, erros)
+
+        # Linha de tendência
+        def funcao_exponencial_negativa(x, a, b, c):
+            return a*x**(-b)+c
+        popt, _pcov = curve_fit(funcao_exponencial_negativa, numero_zonas, erros)
+        x = Symbol('x')
+        equacao_tendencia = popt[0]*x**(-popt[1])+popt[2]
+        funcao_tendencia = lambdify(x, equacao_tendencia)
+        valores_tendencia = [funcao_tendencia(k) for k in eixo_x_continuo]
+        eixo1.plot(eixo_x_continuo, valores_tendencia, 'yellow')
+
+        # Curvatura da linha de tendência
+        primeira_derivada = equacao_tendencia.diff(x)
+        segunda_derivada = primeira_derivada.diff(x)
+        primeira_derivada = lambdify(x, primeira_derivada)
+        segunda_derivada = lambdify(x, segunda_derivada)
+
+        def calcular_curvatura(x):
+            return abs(segunda_derivada(x))*(1 + primeira_derivada(x)**2)**-1.5
+
+        valores_curvatura = [calcular_curvatura(k) for k in eixo_x_continuo]
+        eixo2.plot(eixo_x_continuo, valores_curvatura, 'red')
+        plt.show()
+        # Retorna o ponto estimado para o cotovelo
+        maior_curvatura = max(valores_curvatura)
+        return round(eixo_x_continuo[valores_curvatura.index(maior_curvatura)])
+
 # ----------------------------------------------------------------
 sistema_tarifacao = GeradorDeTarifas(
     arquivo_barras="24B-barras.csv",
@@ -113,3 +160,5 @@ sistema_tarifacao = GeradorDeTarifas(
     barra_referencia=1,
     proporcao_geracao=50
 )
+
+print(sistema_tarifacao.cotovelo())
