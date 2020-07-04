@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+h1, h2, h3{
+    font-variant: small-caps;
+}
+
+h2{
+    border-bottom: 2px solid black;
+}
+
+h3 {
+    text-align: left;
+}
+
+.tabela{
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+}
+
+.tabela-cabecalho {
+    border-bottom: 1px solid black;
+    font-weight: bold;
+}
+
+.tabela-linha{
+    display: flex;
+    justify-content: stretch;
+}
+
+.tabela-celula{
+    text-align: left;
+    width: 100%;
+    padding: 0 15px;
+}
