@@ -4,7 +4,7 @@ from scipy.optimize import curve_fit
 from sklearn.cluster import KMeans
 from sympy import Symbol, lambdify
 
-from sistema import Sistema
+from modulos.sistema import Sistema
 
 numpy.set_printoptions(suppress=True)
 

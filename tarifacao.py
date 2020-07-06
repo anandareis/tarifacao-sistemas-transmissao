@@ -1,6 +1,6 @@
 import argparse
 import sys
-from tarifa import GeradorDeTarifas
+from modulos.tarifa import GeradorDeTarifas
 
 parser = argparse.ArgumentParser(description='Calcula as tarifas nodais e zonais para um sistema de transmissão de energia')
 opcoes = parser.add_subparsers(required=True)
