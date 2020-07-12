@@ -118,7 +118,7 @@ class GeradorDeTarifas:
         eixo2.tick_params(axis='y', labelcolor='red')
 
         numero_zonas = range(2, len(self.sistema.barras))
-        eixo_x_continuo = numpy.linspace(2, 23, 200)
+        eixo_x_continuo = numpy.linspace(2, len(self.sistema.barras), len(self.sistema.barras) *10)
 
         # Erros do K-médias
         erros = []
