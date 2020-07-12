@@ -57,8 +57,42 @@ Onde:
 - Custo_Anual_RS: Custo total anual para a manutenção do circuito, em reais.
 
 
-Então, basta executar:
+Então, basta executar uma das linhas de comando equivalentes abaixo:
 
 ```
+$ python tarifacao.py arquivo --arquivo-barras <arquivo de barras> --arquivo-circuitos <arquivo de circuitos>
 $ python tarifacao.py arquivo -B <arquivo de barras> -C <arquivo de circuitos>
+```
+
+## Definindo parâmetros opcionais de entrada
+
+É possível determinar qual das barras deve ser usada como barra de referência para o cálculo das tarifas,
+e também qual a proporção desejada para distribuição das tarifas locacionais entre geração e carga.
+
+Caso os valores não sejam definidos na linha de comando, será adotada a barra **1** como referência e
+a proporção de geração será de **50** por cento.
+
+- `-r` ou `--barra-referencia`: Define qual barra de referência deve ser adotada
+- `-p` ou `--proporcao-geracao`: Define a porcentagem da tarifa locacional que deve corresponder à geração
+
+Exemplos:
+
+Para definir a barra **5** como barra de referência:
+
+```
+$ python tarifacao.py teste 24_barras --barra-referencia 5
+$ python tarifacao.py teste 24_barras -r 5
+```
+
+Para distribuir a tarifa locacional como 70% para geração e, consequentemente, 30% para carga:
+
+```
+$ python tarifacao.py teste 24_barras --proporcao-geracao 70
+$ python tarifacao.py teste 24_barras -p 70
+```
+
+Para definir a barra 10 como referência e distribuir a tarifa locacional como 40% para geração:
+```
+$ python tarifacao.py teste 24_barras --barra-referencia 10 --proporcao-geracao 40
+$ python tarifacao.py teste 24_barras -r 10 -p 40
 ```
