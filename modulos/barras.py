@@ -23,6 +23,9 @@ class Barras:
     def __len__(self):
         return len(self.elementos)
 
+    def __iter__(self):
+        return iter(self.elementos)
+
     def _criar_barras(self, arquivo_barras):
         tabela_barras = pandas.read_csv(arquivo_barras, sep=";")
         for _, barra in tabela_barras.iterrows():

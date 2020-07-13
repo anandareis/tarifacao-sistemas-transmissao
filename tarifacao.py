@@ -1,6 +1,8 @@
 import argparse
 import sys
+from jinja2 import Template
 from modulos.tarifa import GeradorDeTarifas
+from weasyprint import HTML, CSS
 
 parser = argparse.ArgumentParser(description='Calcula as tarifas nodais e zonais para um sistema de transmissão de energia', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 opcoes = parser.add_subparsers(required=True)
@@ -40,7 +42,6 @@ try:
         barra_referencia=args.barra_referencia,
         proporcao_geracao=args.proporcao_geracao
     )
-    print(sistema_tarifacao.cotovelo())
 
 except FileNotFoundError:
     print("Não foi possível encontrar o arquivo de barras ou o arquivo de circuitos.")
@@ -50,3 +51,16 @@ except FileNotFoundError:
 except IndexError:
     print("Certifique-se de que a barra de referência definida existe no sistema")
     sys.exit(3)
+
+with open('./template_saida/template.html') as html_entrada:
+    template = Template(html_entrada.read())
+
+saida = template.render(
+    barras=sistema_tarifacao.sistema.barras, 
+    circuitos=sistema_tarifacao.sistema.circuitos
+    )
+
+with open('./template_saida/index.html', 'w+') as html_saida:
+    html_saida.write(saida)
+
+HTML('./template_saida/index.html').write_pdf('resultado.pdf', stylesheets=[CSS('./template_saida/style.css')])

@@ -1,5 +1,4 @@
 import numpy
-
 from modulos.barras import Barras
 from modulos.circuitos import Circuitos
 
@@ -17,7 +16,7 @@ class Sistema:
     def calcular_fluxos_potencia(self):
         fluxos = self.construir_matriz_beta().dot(self.barras.vetor_potencia_ativa().T)
         for circuito in self.circuitos:
-            circuito.fluxo_potencia = fluxos[circuito.posicao]
+            circuito.fluxo_potencia = round(fluxos[circuito.posicao], 5)
 
     # Matriz D
     def construir_matriz_susceptancia(self):
