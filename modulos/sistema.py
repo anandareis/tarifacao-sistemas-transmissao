@@ -10,8 +10,14 @@ class Sistema:
         for circuito in self.circuitos:
             circuito.origem = self.barras.obter_barra(circuito.origem)
             circuito.destino = self.barras.obter_barra(circuito.destino)
-        if any(self.vetor_fluxo_potencia() < 0):
+        self.calcular_fluxos_potencia()
+        if any(self.circuitos.construir_vetor_fluxo_potencia() < 0):
             self.corrigir_fluxos_negativos()
+
+    def calcular_fluxos_potencia(self):
+        fluxos = self.construir_matriz_beta().dot(self.barras.vetor_potencia_ativa().T)
+        for circuito in self.circuitos:
+            circuito.fluxo_potencia = fluxos[circuito.posicao]
 
     # Matriz D
     def construir_matriz_susceptancia(self):
@@ -63,12 +69,9 @@ class Sistema:
         X = self.construir_matriz_x()
         return D.dot(C).dot(X)
 
-    #  Vetor F
-    def vetor_fluxo_potencia(self):
-        return self.construir_matriz_beta().dot(self.barras.vetor_potencia_ativa().T)
-
     # Corrigir fluxos negativos
     def corrigir_fluxos_negativos(self):
-        for indice, fluxo in enumerate(self.vetor_fluxo_potencia()):
-            if fluxo < 0:
-                self.circuitos.inverter_origem_destino(indice)
+        for circuito in self.circuitos:
+            if circuito.fluxo_potencia < 0:
+                self.circuitos.inverter_origem_destino(circuito.posicao)
+        self.calcular_fluxos_potencia()

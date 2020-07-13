@@ -11,6 +11,7 @@ class Circuito:
         self.capacidade = capacidade
         self.custo_anual = custo_anual
         self.posicao = numero - 1
+        self.fluxo_potencia = 0
 
     @property
     def susceptancia(self): # é o 'd' da matriz D
@@ -54,6 +55,9 @@ class Circuitos:
 
     def construir_vetor_capacidades(self):
         return numpy.array([circuito.custo_anual for circuito in self.elementos])
+
+    def construir_vetor_fluxo_potencia(self):
+        return numpy.array([circuito.fluxo_potencia for circuito in self.elementos])
 
     def inverter_origem_destino(self, indice):
         self.elementos[indice].inverter_origem_destino()
