@@ -3,8 +3,8 @@ from modulos.barras import Barras
 from modulos.circuitos import Circuitos
 
 class Sistema:
-    def __init__(self, arquivo_barras, arquivo_circuitos, barra_referencia):
-        self.barras = Barras(arquivo_barras, barra_referencia)
+    def __init__(self, arquivo_barras, arquivo_circuitos, numero_barra_referencia):
+        self.barras = Barras(arquivo_barras, numero_barra_referencia)
         self.circuitos = Circuitos(arquivo_circuitos)
         for circuito in self.circuitos:
             circuito.origem = self.barras.obter_barra(circuito.origem)

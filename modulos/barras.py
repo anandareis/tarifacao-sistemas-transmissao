@@ -1,5 +1,6 @@
 import pandas
 import numpy
+import sys
 
 class Barra:
     def __init__(self, numero, potencia_gerada, capacidade_instalada, potencia_consumida):
@@ -15,10 +16,11 @@ class Barra:
 
 
 class Barras:
-    def __init__(self, arquivo_barras, barra_referencia):
+    def __init__(self, arquivo_barras, numero_barra_referencia):
         self.elementos = []
         self._criar_barras(arquivo_barras)
-        self.barra_referencia = self.elementos[barra_referencia-1]
+        self.barra_referencia = self.obter_barra(numero_barra_referencia)
+        self.definir_geracao_referencia()
 
     def __len__(self):
         return len(self.elementos)
@@ -42,13 +44,25 @@ class Barras:
                 return barra
         return None
 
+    def definir_geracao_referencia(self):
+        self.barra_referencia.potencia_gerada = 0
+        geracao_referencia = numpy.sum(self.vetor_potencia_consumida()) - numpy.sum(self.vetor_potencia_gerada())
+        if geracao_referencia < 0:
+            print('ERRO: A barra de referência definida não pode ser usada para este sistema.')
+            print('O valor obtido para a geração de referência foi negativo.')
+            print('Defina uma barra de referência com maior valor de potência gerada.')
+            sys.exit(4)
+        if geracao_referencia > self.barra_referencia.capacidade_instalada:
+            print('ERRO: A barra de referência definida não pode ser usada para este sistema.')
+            print('O valor obtido para a geração de referência excede a capacidade instalada.')
+            print('Defina uma barra de referência com maior capacidade instalada.')
+            sys.exit(4)
+
+        self.barra_referencia.potencia_gerada = geracao_referencia
+
     # Vetor PG
-    def vetor_potencia_gerada(self, usar_referencia=False):
-        vetor = numpy.array([barra.potencia_gerada for barra in self.elementos])
-        if usar_referencia:
-            vetor[self.barra_referencia.posicao] = 0
-            vetor[self.barra_referencia.posicao] = numpy.sum(self.vetor_potencia_consumida()) - numpy.sum(vetor)
-        return vetor
+    def vetor_potencia_gerada(self):
+        return numpy.array([barra.potencia_gerada for barra in self.elementos])
 
     # Vetor PC
     def vetor_potencia_consumida(self):

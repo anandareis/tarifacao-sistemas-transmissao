@@ -39,7 +39,7 @@ try:
     sistema_tarifacao = GeradorDeTarifas(
         arquivo_barras=csv_barras,
         arquivo_circuitos=csv_circuitos,
-        barra_referencia=args.barra_referencia,
+        numero_barra_referencia=args.barra_referencia,
         proporcao_geracao=args.proporcao_geracao
     )
 

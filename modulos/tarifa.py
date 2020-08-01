@@ -9,9 +9,9 @@ from modulos.sistema import Sistema
 numpy.set_printoptions(suppress=True)
 
 class GeradorDeTarifas:
-    def __init__(self, arquivo_barras, arquivo_circuitos, barra_referencia, proporcao_geracao):
+    def __init__(self, arquivo_barras, arquivo_circuitos, numero_barra_referencia, proporcao_geracao):
         self.ro = (100-proporcao_geracao) / proporcao_geracao
-        self.sistema = Sistema(arquivo_barras, arquivo_circuitos, barra_referencia)
+        self.sistema = Sistema(arquivo_barras, arquivo_circuitos, numero_barra_referencia)
 
     # Matriz de tarifas iniciais sem ajuste
     def tarifa_inicial(self):
@@ -22,7 +22,7 @@ class GeradorDeTarifas:
 
     # Ajuste das tarifas iniciais
     def ajuste_m(self):
-        vetor_pg = self.sistema.barras.vetor_potencia_gerada(usar_referencia=True)
+        vetor_pg = self.sistema.barras.vetor_potencia_gerada()
         vetor_pc = self.sistema.barras.vetor_potencia_consumida()
         return - self.tarifa_inicial() .dot((self.ro*vetor_pg + vetor_pc).T) / (self.ro * (numpy.sum(vetor_pg))+numpy.sum(vetor_pc))
 
@@ -36,15 +36,15 @@ class GeradorDeTarifas:
 
     # CTU PG
     def calcular_CTUPG(self):
-        return self.tar_ctu().dot(self.sistema.barras.vetor_potencia_gerada(True).T)
+        return self.tar_ctu().dot(self.sistema.barras.vetor_potencia_gerada().T)
 
     # CTU
     def calcular_CTU(self):
-        return self.tar_ctu().dot((self.sistema.barras.vetor_potencia_gerada(True) - self.sistema.barras.vetor_potencia_consumida()).T)
+        return self.tar_ctu().dot((self.sistema.barras.vetor_potencia_gerada() - self.sistema.barras.vetor_potencia_consumida()).T)
 
     # CTU PG Barras
     def ctu_PG_barras(self):
-        return self.tar_ctu() * self.sistema.barras.vetor_potencia_gerada(True)
+        return self.tar_ctu() * self.sistema.barras.vetor_potencia_gerada()
 
     # CTU PC Barras
     def ctu_PC_barras(self):
@@ -94,7 +94,7 @@ class GeradorDeTarifas:
 
         montante_negativo = numpy.sum(valores_negativos)
 
-        referencia_proporcao = self.sistema.barras.vetor_potencia_gerada(True) if tipo_correcao == 'geracao' else self.sistema.barras.vetor_potencia_consumida()
+        referencia_proporcao = self.sistema.barras.vetor_potencia_gerada() if tipo_correcao == 'geracao' else self.sistema.barras.vetor_potencia_consumida()
         valores_proporcao = numpy.where(valores_positivos > 0, referencia_proporcao, 0)
         proporcao = valores_proporcao / numpy.sum(valores_proporcao)
 
