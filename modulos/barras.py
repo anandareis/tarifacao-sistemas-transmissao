@@ -9,6 +9,18 @@ class Barra:
         self.capacidade_instalada = capacidade_instalada
         self.potencia_consumida = potencia_consumida
         self.posicao = numero - 1
+        self.encargos = {
+            'geracao': {
+                'CTU': 0,
+                'CTN': 0,
+                'total_corrigido': 0
+            },
+            'carga': {
+                'CTU': 0,
+                'CTN': 0,
+                'total_corrigido': 0
+            }
+        }
 
     @property
     def potencia_ativa(self):
@@ -75,3 +87,10 @@ class Barras:
     # Capacidade de geração instalada
     def vetor_capacidade_instalada(self):
         return numpy.array([barra.capacidade_instalada for barra in self.elementos])
+
+    # CTU total das barras
+    def vetor_encargo_ctu(self):
+        return numpy.array([barra.encargos['geracao']['CTU'] + barra.encargos['carga']['CTU'] for barra in self.elementos])
+
+    def vetor_encargos_finais(self, tipo):
+        return numpy.array([barra.encargos[tipo]['CTU'] + barra.encargos[tipo]['CTN'] for barra in self.elementos])
