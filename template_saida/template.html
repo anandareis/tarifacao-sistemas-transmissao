@@ -41,6 +41,7 @@
                 <div class="tabela-celula">Barra de Origem</div>
                 <div class="tabela-celula">Barra de Destino</div>
                 <div class="tabela-celula">Capacidade (MW)</div>
+                <div class="tabela-celula">Custo (R$)</div>
                 <div class="tabela-celula">Fluxo de Potência (MW)</div>
             </div>
             {% for circuito in circuitos %}
@@ -49,16 +50,105 @@
                 <div class="tabela-celula">{{ circuito.origem.numero }}</div>
                 <div class="tabela-celula">{{ circuito.destino.numero }}</div>
                 <div class="tabela-celula">{{ circuito.capacidade }}</div>
+                <div class="tabela-celula">{{ circuito.custo_anual }}</div>
                 <div class="tabela-celula">{{ circuito.fluxo_potencia }}</div>
             </div>
             {% endfor %}
         </div>
+        <p>Custo total da transmissão (CTT): <strong>{{ circuitos.construir_vetor_custos_anuais() | sum }}</strong></p>
     </div>
     <!-- Tarifas Nodais -->
-    Tarifas Nodais
-    <!-- Zonal Homogêneo -->
-    Zonal Homogêneo
-    <!-- Zonal Heterogêneo -->
-    Zonal Heterogêneo
-</body>
+    <div class="conteudo">
+        <h3>Tarifas Nodais</h3>
+        <p>As tarifas do CTU são calculadas por barra, como mostrado na tabela.</p>
+        <p>As tarifas do CTN são:</p>
+        <p>Para geração, <strong>kg = {{ f(ctn['kg']) }}</strong></p>
+        <p>Para carga, <strong>kc = {{ f(ctn['kc']) }}</strong></p>
+    </div>
+    <div class="conteudo">
+        <h4>Dados de Geração</h4>
+        <div class="tabela">
+            <div class="tabela-cabecalho tabela-linha">
+                <div class="tabela-celula">Barra</div>
+                <div class="tabela-celula">Tarifa Locacional</div>
+                <div class="tabela-celula">Encargo Locacional</div>
+                <div class="tabela-celula">Encargo Selo</div>
+                <div class="tabela-celula">Encargo Total</div>
+            </div>
+            {% for barra in barras %}
+            {% if barra.potencia_gerada > 0 or barra.capacidade_instalada > 0 %}
+            <div class="tabela-linha">
+                <div class="tabela-celula">{{ barra.numero }}</div>
+                <div class="tabela-celula">{{ f(d(barra.encargos['geracao']['CTU'], barra.potencia_gerada)) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['geracao']['CTU']) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['geracao']['CTN']) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['geracao']['CTU'] + barra.encargos['geracao']['CTN']) }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="conteudo">
+        <h4>Dados de Carga</h4>
+        <div class="tabela">
+            <div class="tabela-cabecalho tabela-linha">
+                <div class="tabela-celula">Barra</div>
+                <div class="tabela-celula">Tarifa Locacional</div>
+                <div class="tabela-celula">Encargo Locacional</div>
+                <div class="tabela-celula">Encargo Selo</div>
+                <div class="tabela-celula">Encargo Total</div>
+            </div>
+            {% for barra in barras %}
+            {% if barra.potencia_consumida > 0 %}
+            <div class="tabela-linha">
+                <div class="tabela-celula">{{ barra.numero }}</div>
+                <div class="tabela-celula">{{ f(d(barra.encargos['carga']['CTU'], -barra.potencia_consumida)) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['carga']['CTU']) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['carga']['CTN']) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['carga']['CTU'] + barra.encargos['carga']['CTN']) }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="conteudo">
+        {% if corrigido %}
+        <p>Para esse cenário operativo, foi necessário fazer a correção de encargos negativos. Os valores finais são os valores corrigidos.</p>
+        {% endif %}
+        <h4>Encargos e tarifas finais</h4>
+        <div class="tabela">
+            <div class="tabela-cabecalho tabela-linha">
+                <div class="tabela-celula">Barra</div>
+                <div class="tabela-celula">Encargo de Geração</div>
+                <div class="tabela-celula">Tarifa de Geração</div>
+                <div class="tabela-celula">Encargo de Carga</div>
+                <div class="tabela-celula">Tarifa de Carga</div>
+            </div>
+            {% for barra in barras %}
+            <div class="tabela-linha">
+                <div class="tabela-celula">{{ barra.numero }}</div>
+                {% if 'geracao' not in corrigido %}
+                <div class="tabela-celula">{{ f(barra.encargos['geracao']['CTU'] + barra.encargos['geracao']['CTN']) }}</div>
+                <div class="tabela-celula">{{ f(d((barra.encargos['geracao']['CTU'] + barra.encargos['geracao']['CTN']), barra.capacidade_instalada)) }}</div>
+                {% endif %}
+                {% if 'geracao' in corrigido %}
+                <div class="tabela-celula">{{ f(barra.encargos['geracao']['total_corrigido']) }}</div>
+                <div class="tabela-celula">{{ f(d(barra.encargos['geracao']['total_corrigido'], barra.capacidade_instalada)) }}</div>
+                {% endif %}
+                {% if 'carga' not in corrigido %}
+                <div class="tabela-celula">{{ f(barra.encargos['carga']['CTU'] + barra.encargos['carga']['CTN']) }}</div>
+                <div class="tabela-celula">{{ f(d((barra.encargos['carga']['CTU'] + barra.encargos['carga']['CTN']), barra.potencia_consumida)) }}</div>
+                {% endif %}
+                {% if 'carga' in corrigido %}
+                <div class="tabela-celula">{{ f(barra.encargos['carga']['total_corrigido']) }}</div>
+                <div class="tabela-celula">{{ f(d(barra.encargos['carga']['total_corrigido'], barra.potencia_consumida)) }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Tarifas Zonais -->
+    <div class="conteudo">
+        <h3>Tarifas Zonais</h3>
+    </div>
 </html>

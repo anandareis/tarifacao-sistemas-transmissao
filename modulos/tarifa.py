@@ -10,17 +10,25 @@ class GeradorDeTarifas:
     def __init__(self, arquivo_barras, arquivo_circuitos, numero_barra_referencia, proporcao_geracao):
         self.ro = (100-proporcao_geracao) / proporcao_geracao
         self.sistema = Sistema(arquivo_barras, arquivo_circuitos, numero_barra_referencia)
-        self.correcoes = []
+        self.tarifas_ctn = {
+            'kc': 0,
+            'kg': 0
+        }
+        self.corrigido = []
+        self.calcular_tarifas_nodais()
+
+    # Realizar todos os cálculos para tarifação nodal
+    def calcular_tarifas_nodais(self):
         self.definir_encargos_ctu()
         self.definir_encargos_ctn()
         encargos_finais_geracao = self.sistema.barras.vetor_encargos_finais('geracao')
         encargos_finais_carga = self.sistema.barras.vetor_encargos_finais('carga')
         if any(encargos_finais_geracao < 0):
             self.corrigir_alocacao_negativa(encargos_finais_geracao, 'geracao')
-            self.correcoes.append('geracao')
+            self.corrigido.append('geracao')
         if any(encargos_finais_carga < 0):
             self.corrigir_alocacao_negativa(encargos_finais_carga, 'carga')
-            self.correcoes.append('carga')
+            self.corrigido.append('carga')
 
     # Matriz de tarifas iniciais sem ajuste
     def calcular_tarifa_inicial(self):
@@ -53,6 +61,8 @@ class GeradorDeTarifas:
         ctn_total = self.calcular_ctn()
         kg = (ctn_total/2)/numpy.sum(self.sistema.barras.vetor_capacidade_instalada())
         kc = (ctn_total/2)/numpy.sum(self.sistema.barras.vetor_potencia_consumida())
+        self.tarifas_ctn['kg'] = kg
+        self.tarifas_ctn['kc'] = kc
         for barra in self.sistema.barras:
             barra.encargos['geracao']['CTN'] = kg * barra.capacidade_instalada
             barra.encargos['carga']['CTN'] = kc * barra.potencia_consumida

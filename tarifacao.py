@@ -2,6 +2,7 @@ import argparse
 import sys
 from jinja2 import Template
 from modulos.tarifa import GeradorDeTarifas
+from modulos.utils import formatar_moeda, dividir
 from weasyprint import HTML, CSS
 
 parser = argparse.ArgumentParser(description='Calcula as tarifas nodais e zonais para um sistema de transmissão de energia', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -57,7 +58,11 @@ with open('./template_saida/template.html') as html_entrada:
 
 saida = template.render(
     barras=sistema_tarifacao.sistema.barras, 
-    circuitos=sistema_tarifacao.sistema.circuitos
+    circuitos=sistema_tarifacao.sistema.circuitos,
+    ctn = sistema_tarifacao.tarifas_ctn,
+    corrigido = sistema_tarifacao.corrigido,
+    f = formatar_moeda,
+    d = dividir
     )
 
 with open('./template_saida/index.html', 'w+') as html_saida:
