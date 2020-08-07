@@ -55,7 +55,7 @@
             </div>
             {% endfor %}
         </div>
-        <p>Custo total da transmissão (CTT): <strong>{{ circuitos.construir_vetor_custos_anuais() | sum }}</strong></p>
+        <p>Custo total da transmissão (CTT): <strong>R$ {{ f(circuitos.construir_vetor_custos_anuais() | sum) }}</strong></p>
     </div>
     <!-- Tarifas Nodais -->
     <div class="conteudo">
@@ -146,6 +146,8 @@
             </div>
             {% endfor %}
         </div>
+        <p>Engargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
+        <p>Encargos totais para carga: <strong>R$ {{ f(barras.vetor_encargos_finais('carga') | sum) }}</strong></p>
     </div>
     <!-- Tarifas Zonais -->
     <div class="conteudo">
