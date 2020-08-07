@@ -1,7 +1,8 @@
 import argparse
 import sys
 from jinja2 import Template
-from modulos.tarifa import GeradorDeTarifas
+from modulos.sistema import Sistema
+from modulos.nodal import TarifasNodais
 from modulos.utils import formatar_moeda, dividir
 from weasyprint import HTML, CSS
 
@@ -37,10 +38,13 @@ else:
     csv_circuitos = args.arquivo_circuitos
 
 try:
-    sistema_tarifacao = GeradorDeTarifas(
+    sistema = Sistema(
         arquivo_barras=csv_barras,
         arquivo_circuitos=csv_circuitos,
-        numero_barra_referencia=args.barra_referencia,
+        numero_barra_referencia=args.barra_referencia
+    )
+    tarifacao_nodal = TarifasNodais(
+        sistema=sistema,
         proporcao_geracao=args.proporcao_geracao
     )
 
@@ -57,10 +61,10 @@ with open('./template_saida/template.html') as html_entrada:
     template = Template(html_entrada.read())
 
 saida = template.render(
-    barras=sistema_tarifacao.sistema.barras, 
-    circuitos=sistema_tarifacao.sistema.circuitos,
-    ctn = sistema_tarifacao.tarifas_ctn,
-    corrigido = sistema_tarifacao.corrigido,
+    barras=sistema.barras,
+    circuitos=sistema.circuitos,
+    ctn = tarifacao_nodal.tarifas_ctn,
+    corrigido = tarifacao_nodal.corrigido,
     f = formatar_moeda,
     d = dividir
     )
