@@ -4,8 +4,9 @@ from modulos.circuitos import Circuitos
 
 class Sistema:
     def __init__(self, arquivo_barras, arquivo_circuitos, numero_barra_referencia):
-        self.barras = Barras(arquivo_barras, numero_barra_referencia)
-        self.circuitos = Circuitos(arquivo_circuitos)
+        self.barras = Barras.criar_do_arquivo(arquivo_barras)
+        self.barras.definir_referencia(numero_barra_referencia)
+        self.circuitos = Circuitos.criar_do_arquivo(arquivo_circuitos)
         for circuito in self.circuitos:
             circuito.origem = self.barras.obter_barra(circuito.origem)
             circuito.destino = self.barras.obter_barra(circuito.destino)

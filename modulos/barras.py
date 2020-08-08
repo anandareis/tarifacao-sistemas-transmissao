@@ -28,35 +28,43 @@ class Barra:
 
 
 class Barras:
-    def __init__(self, arquivo_barras, numero_barra_referencia):
-        self.elementos = []
-        self._criar_barras(arquivo_barras)
-        self.barra_referencia = self.obter_barra(numero_barra_referencia)
-        self.definir_geracao_referencia()
+    def __init__(self):
+        self._elementos = []
+        self.barra_referencia = None
 
     def __len__(self):
-        return len(self.elementos)
+        return len(self._elementos)
 
     def __iter__(self):
-        return iter(self.elementos)
+        return iter(self._elementos)
 
-    def _criar_barras(self, arquivo_barras):
+    @classmethod
+    def criar_do_arquivo(cls, arquivo_barras):
+        barras = Barras()
         tabela_barras = pandas.read_csv(arquivo_barras, sep=";")
         for _, barra in tabela_barras.iterrows():
-            self.elementos.append(Barra(
+            barras.adicionar_barra(Barra(
                 numero=int(barra['Num']),
                 potencia_gerada=barra['Potg_MW'],
                 capacidade_instalada=barra['Capac_Inst_MW'],
                 potencia_consumida=barra['Potc_MW']
             ))
+        return barras
+
+    def adicionar_barra(self, barra):
+        self._elementos.append(barra)
 
     def obter_barra(self, numero):
-        for barra in self.elementos:
+        for barra in self._elementos:
             if barra.numero == numero:
                 return barra
         return None
 
-    def definir_geracao_referencia(self):
+    def definir_referencia(self, numero_barra_referencia):
+        self.barra_referencia = self.obter_barra(numero_barra_referencia)
+        self._definir_geracao_referencia()
+
+    def _definir_geracao_referencia(self, ):
         self.barra_referencia.potencia_gerada = 0
         geracao_referencia = numpy.sum(self.vetor_potencia_consumida()) - numpy.sum(self.vetor_potencia_gerada())
         if geracao_referencia < 0:
@@ -69,28 +77,27 @@ class Barras:
             print('O valor obtido para a geração de referência excede a capacidade instalada.')
             print('Defina uma barra de referência com maior capacidade instalada.')
             sys.exit(4)
-
         self.barra_referencia.potencia_gerada = geracao_referencia
 
     # Vetor PG
     def vetor_potencia_gerada(self):
-        return numpy.array([barra.potencia_gerada for barra in self.elementos])
+        return numpy.array([barra.potencia_gerada for barra in self._elementos])
 
     # Vetor PC
     def vetor_potencia_consumida(self):
-        return numpy.array([barra.potencia_consumida for barra in self.elementos])
+        return numpy.array([barra.potencia_consumida for barra in self._elementos])
 
     # P
     def vetor_potencia_ativa(self):
-        return numpy.array([barra.potencia_ativa for barra in self.elementos])
+        return numpy.array([barra.potencia_ativa for barra in self._elementos])
 
     # Capacidade de geração instalada
     def vetor_capacidade_instalada(self):
-        return numpy.array([barra.capacidade_instalada for barra in self.elementos])
+        return numpy.array([barra.capacidade_instalada for barra in self._elementos])
 
     # CTU total das barras
     def vetor_encargo_ctu(self):
-        return numpy.array([barra.encargos['geracao']['CTU'] + barra.encargos['carga']['CTU'] for barra in self.elementos])
+        return numpy.array([barra.encargos['geracao']['CTU'] + barra.encargos['carga']['CTU'] for barra in self._elementos])
 
     def vetor_encargos_finais(self, tipo):
-        return numpy.array([barra.encargos[tipo]['CTU'] + barra.encargos[tipo]['CTN'] for barra in self.elementos])
+        return numpy.array([barra.encargos[tipo]['CTU'] + barra.encargos[tipo]['CTN'] for barra in self._elementos])

@@ -24,20 +24,21 @@ class Circuito:
 
 
 class Circuitos:
-    def __init__(self, arquivo_circuitos):
-        self.elementos = []
-        self._criar_circuitos(arquivo_circuitos)
+    def __init__(self):
+        self._elementos = []
 
     def __len__(self):
-        return len(self.elementos)
+        return len(self._elementos)
 
     def __iter__(self):
-        return iter(self.elementos)
+        return iter(self._elementos)
 
-    def _criar_circuitos(self, arquivo_circuitos):
+    @classmethod
+    def criar_do_arquivo(cls, arquivo_circuitos):
+        circuitos = Circuitos()
         tabela_circuitos = pandas.read_csv(arquivo_circuitos, sep=";")
         for _, circuito in tabela_circuitos.iterrows():
-            self.elementos.append(Circuito(
+            circuitos.adicionar_circuito(Circuito(
                 numero=int(circuito['Num']),
                 origem=int(circuito['De']),
                 destino=int(circuito['Para']),
@@ -46,18 +47,22 @@ class Circuitos:
                 capacidade=circuito['Capac_MW'],
                 custo_anual=circuito['Custo_Anual_RS']
             ))
+        return circuitos
+
+    def adicionar_circuito(self, circuito):
+        self._elementos.append(circuito)
 
     def construir_vetor_susceptancias(self):
-        return numpy.array([circuito.susceptancia for circuito in self.elementos])
+        return numpy.array([circuito.susceptancia for circuito in self._elementos])
 
     def construir_vetor_custos_anuais(self):
-        return numpy.array([circuito.custo_anual for circuito in self.elementos])
+        return numpy.array([circuito.custo_anual for circuito in self._elementos])
 
     def construir_vetor_capacidades(self):
-        return numpy.array([circuito.custo_anual for circuito in self.elementos])
+        return numpy.array([circuito.custo_anual for circuito in self._elementos])
 
     def construir_vetor_fluxo_potencia(self):
-        return numpy.array([circuito.fluxo_potencia for circuito in self.elementos])
+        return numpy.array([circuito.fluxo_potencia for circuito in self._elementos])
 
     def inverter_origem_destino(self, indice):
-        self.elementos[indice].inverter_origem_destino()
+        self._elementos[indice].inverter_origem_destino()
