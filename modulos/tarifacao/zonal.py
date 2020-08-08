@@ -4,7 +4,7 @@ from scipy.optimize import curve_fit
 from sklearn.cluster import KMeans
 from sympy import Symbol, lambdify
 
-from modulos.zonas import Zona
+from modulos.modelos.zonas import Zona
 from modulos.utils import dividir as d
 
 class TarifasZonais:

@@ -1,6 +1,6 @@
 import numpy
-from modulos.barras import Barras
-from modulos.circuitos import Circuitos
+from modulos.modelos.barras import Barras
+from modulos.modelos.circuitos import Circuitos
 
 class Sistema:
     def __init__(self, arquivo_barras, arquivo_circuitos, numero_barra_referencia):

@@ -2,8 +2,8 @@ import argparse
 import sys
 from jinja2 import Template
 from modulos.sistema import Sistema
-from modulos.nodal import TarifasNodais
-from modulos.zonal import TarifasZonais
+from modulos.tarifacao.nodal import TarifasNodais
+from modulos.tarifacao.zonal import TarifasZonais
 from modulos.utils import formatar_moeda, dividir
 from weasyprint import HTML, CSS
 
