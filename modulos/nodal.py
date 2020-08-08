@@ -8,6 +8,7 @@ class TarifasNodais:
             'kc': 0,
             'kg': 0
         }
+        self.tarifas_ctu = []
         self.corrigido = []
         self.calcular_tarifas_nodais()
 
@@ -40,6 +41,7 @@ class TarifasNodais:
     # Definir as tarifas do CTU nas barras
     def definir_encargos_ctu(self):
         tar_ctu = self.calcular_tarifa_inicial() + numpy.full_like(self.calcular_tarifa_inicial(), self.calcular_ajuste_m())
+        self.tarifas_ctu = tar_ctu
         for barra in self.sistema.barras:
             barra.encargos['geracao']['CTU'] = tar_ctu[barra.posicao] * barra.potencia_gerada
             barra.encargos['carga']['CTU'] = tar_ctu[barra.posicao] * -barra.potencia_consumida
@@ -78,4 +80,4 @@ class TarifasNodais:
             self.corrigir_alocacao_negativa(valores_corrigidos, tipo)
         else:
             for barra in self.sistema.barras:
-                barra.encargos[tipo]['total_corrigido'] = valores_corrigidos[barra.posicao]
+                barra.encargos[tipo]['nodal_corrigido'] = valores_corrigidos[barra.posicao]

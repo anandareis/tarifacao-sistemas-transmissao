@@ -13,12 +13,12 @@ class Barra:
             'geracao': {
                 'CTU': 0,
                 'CTN': 0,
-                'total_corrigido': 0
+                'nodal_corrigido': 0
             },
             'carga': {
                 'CTU': 0,
                 'CTN': 0,
-                'total_corrigido': 0
+                'nodal_corrigido': 0
             }
         }
 
@@ -96,8 +96,16 @@ class Barras:
         return numpy.array([barra.capacidade_instalada for barra in self._elementos])
 
     # CTU total das barras
-    def vetor_encargo_ctu(self):
-        return numpy.array([barra.encargos['geracao']['CTU'] + barra.encargos['carga']['CTU'] for barra in self._elementos])
+    def vetor_encargo_ctu(self, tipo=None):
+        ctu_geracao = numpy.array([barra.encargos['geracao']['CTU'] for barra in self._elementos])
+        ctu_carga = numpy.array([barra.encargos['carga']['CTU'] for barra in self._elementos])
+
+        if tipo == 'geracao':
+            return ctu_geracao
+        elif tipo == 'carga':
+            return ctu_carga
+        else:
+            return ctu_geracao + ctu_carga
 
     def vetor_encargos_finais(self, tipo):
         return numpy.array([barra.encargos[tipo]['CTU'] + barra.encargos[tipo]['CTN'] for barra in self._elementos])

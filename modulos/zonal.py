@@ -4,10 +4,42 @@ from scipy.optimize import curve_fit
 from sklearn.cluster import KMeans
 from sympy import Symbol, lambdify
 
+from modulos.zonas import Zona
+from modulos.utils import dividir as d
+
 class TarifasZonais:
-    def calcular_k_medias(self, n_clusters):
-        kmeans = KMeans(n_clusters=n_clusters).fit_predict(self.definir_tarifas_ctu().reshape(-1, 1))
-        return (kmeans)
+    def __init__(self, sistema, tarifas_ctu, tarifas_ctn):
+        self.sistema = sistema
+        self.zonas = []
+        self.tarifas_ctu = tarifas_ctu
+        self.tarifas_ctn = tarifas_ctn
+        self.calcular_tarifas_zonais()
+
+    def calcular_tarifas_zonais(self):
+        numero_zonas = self.cotovelo()
+        self.definir_zonas(numero_zonas)
+        self.definir_tarifas_encargos_zonais()
+
+    def definir_tarifas_encargos_zonais(self):
+        for zona in self.zonas:
+            ctu_geracao = numpy.sum(zona.barras.vetor_encargo_ctu(tipo='geracao'))
+            ctu_carga = numpy.sum(zona.barras.vetor_encargo_ctu(tipo='carga'))
+            potencia_instalada = numpy.sum(zona.barras.vetor_capacidade_instalada())
+            potencia_consumida = numpy.sum(zona.barras.vetor_potencia_consumida())
+
+            zona.encargos['geracao'] = ctu_geracao
+            zona.encargos['carga'] = ctu_carga
+            zona.tarifas['geracao'] = d(ctu_geracao, potencia_instalada)
+            zona.tarifas['carga'] = d(ctu_carga, potencia_consumida)
+
+    def definir_zonas(self, n_zonas):
+        zonas = KMeans(n_clusters=n_zonas).fit_predict(self.tarifas_ctu.reshape(-1, 1))
+        for i in range(n_zonas):
+            zona = Zona(numero=i+1)
+            for barra in self.sistema.barras :
+                if zonas[barra.posicao] == i:
+                    zona.barras.adicionar_barra(barra)
+            self.zonas.append(zona)
 
     def cotovelo(self):
         _figura, eixo1 = plt.subplots()
@@ -23,7 +55,7 @@ class TarifasZonais:
         # Erros do K-médias
         erros = []
         for n in numero_zonas:
-            kmeans = KMeans(n_clusters=n).fit(self.definir_tarifas_ctu().reshape(-1,1))
+            kmeans = KMeans(n_clusters=n).fit(self.tarifas_ctu.reshape(-1,1))
             erros.append(kmeans.inertia_)
         eixo1.scatter(numero_zonas, erros)
 
@@ -48,7 +80,7 @@ class TarifasZonais:
 
         valores_curvatura = [calcular_curvatura(k) for k in eixo_x_continuo]
         eixo2.plot(eixo_x_continuo, valores_curvatura, 'red')
-        plt.show()
+        # plt.show()
         # Retorna o ponto estimado para o cotovelo
         maior_curvatura = max(valores_curvatura)
-        return round(eixo_x_continuo[valores_curvatura.index(maior_curvatura)])
+        return int(round(eixo_x_continuo[valores_curvatura.index(maior_curvatura)]))
