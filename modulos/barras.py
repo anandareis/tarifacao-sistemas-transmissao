@@ -38,6 +38,9 @@ class Barras:
     def __iter__(self):
         return iter(self._elementos)
 
+    def __str__(self):
+        return ", ".join([str(barra.numero) for barra in self._elementos])
+
     @classmethod
     def criar_do_arquivo(cls, arquivo_barras):
         barras = Barras()

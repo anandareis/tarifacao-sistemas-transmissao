@@ -132,16 +132,16 @@
                 <div class="tabela-celula">{{ f(d((barra.encargos['geracao']['CTU'] + barra.encargos['geracao']['CTN']), barra.capacidade_instalada)) }}</div>
                 {% endif %}
                 {% if 'geracao' in corrigido %}
-                <div class="tabela-celula">{{ f(barra.encargos['geracao']['total_corrigido']) }}</div>
-                <div class="tabela-celula">{{ f(d(barra.encargos['geracao']['total_corrigido'], barra.capacidade_instalada)) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['geracao']['nodal_corrigido']) }}</div>
+                <div class="tabela-celula">{{ f(d(barra.encargos['geracao']['nodal_corrigido'], barra.capacidade_instalada)) }}</div>
                 {% endif %}
                 {% if 'carga' not in corrigido %}
                 <div class="tabela-celula">{{ f(barra.encargos['carga']['CTU'] + barra.encargos['carga']['CTN']) }}</div>
                 <div class="tabela-celula">{{ f(d((barra.encargos['carga']['CTU'] + barra.encargos['carga']['CTN']), barra.potencia_consumida)) }}</div>
                 {% endif %}
                 {% if 'carga' in corrigido %}
-                <div class="tabela-celula">{{ f(barra.encargos['carga']['total_corrigido']) }}</div>
-                <div class="tabela-celula">{{ f(d(barra.encargos['carga']['total_corrigido'], barra.potencia_consumida)) }}</div>
+                <div class="tabela-celula">{{ f(barra.encargos['carga']['nodal_corrigido']) }}</div>
+                <div class="tabela-celula">{{ f(d(barra.encargos['carga']['nodal_corrigido'], barra.potencia_consumida)) }}</div>
                 {% endif %}
             </div>
             {% endfor %}
@@ -152,5 +152,58 @@
     <!-- Tarifas Zonais -->
     <div class="conteudo">
         <h3>Tarifas Zonais</h3>
+        <p>A divisão do sistema em zonas se deu da seguinte forma:</p>
+        {% for zona in zonas %}
+        <p>Zona {{ zona.numero }}: Barras {{ zona.barras }}</p>
+        {% endfor %}
+
+        <p>As tarifas do CTU são calculadas por zona, como mostrado na tabela.</p>
+        <p>As tarifas do CTN são:</p>
+        <p>Para geração, <strong>kg = {{ f(ctn['kg']) }}</strong></p>
+        <p>Para carga, <strong>kc = {{ f(ctn['kc']) }}</strong></p>
+    </div>
+    <div class="conteudo">
+        <h4>Dados das Zonas</h4>
+        <div class="tabela">
+            <div class="tabela-cabecalho tabela-linha">
+                <div class="tabela-celula">Zona</div>
+                <div class="tabela-celula">Tarifa Locacional de Geração</div>
+                <div class="tabela-celula">Tarifa Locacional de Carga</div>
+                <div class="tabela-celula">Encargo Locacional de Geração</div>
+                <div class="tabela-celula">Encargo Locacional de Carga</div>
+            </div>
+            {% for zona in zonas %}
+            <div class="tabela-linha">
+                <div class="tabela-celula">{{ zona.numero }}</div>
+                <div class="tabela-celula">{{ f(zona.tarifas['geracao']) }}</div>
+                <div class="tabela-celula">{{ f(zona.tarifas['carga']) }}</div>
+                <div class="tabela-celula">{{ f(zona.encargos['geracao']) }}</div>
+                <div class="tabela-celula">{{ f(zona.encargos['carga']) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="conteudo">
+        <h4>Tarifas Finais das Zonas</h4>
+        <div class="tabela">
+            <div class="tabela-cabecalho tabela-linha">
+                <div class="tabela-celula">Zona</div>
+                <div class="tabela-celula">Tarifa Final de Geração</div>
+                <div class="tabela-celula">Tarifa Final de Carga</div>
+                <div class="tabela-celula">Encargo Final de Geração</div>
+                <div class="tabela-celula">Encargo Final de Carga</div>
+            </div>
+            {% for zona in zonas %}
+            <div class="tabela-linha">
+                <div class="tabela-celula">{{ zona.numero }}</div>
+                <div class="tabela-celula">{{ f(zona.tarifas['geracao'] + ctn['kg']) }}</div>
+                <div class="tabela-celula">{{ f(zona.tarifas['carga'] + ctn['kc']) }}</div>
+                <div class="tabela-celula">{{ f((zona.tarifas['geracao'] + ctn['kg']) * zona.barras.vetor_capacidade_instalada() | sum ) }}</div>
+                <div class="tabela-celula">{{ f((zona.tarifas['carga'] + ctn['kc']) * zona.barras.vetor_potencia_consumida() | sum ) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <p>Engargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
+        <p>Encargos totais para carga: <strong>R$ {{ f(barras.vetor_encargos_finais('carga') | sum) }}</strong></p>
     </div>
 </html>

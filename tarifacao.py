@@ -71,6 +71,7 @@ saida = template.render(
     circuitos=sistema.circuitos,
     ctn = tarifacao_nodal.tarifas_ctn,
     corrigido = tarifacao_nodal.corrigido,
+    zonas = tarifacao_zonal.zonas,
     f = formatar_moeda,
     d = dividir
     )
