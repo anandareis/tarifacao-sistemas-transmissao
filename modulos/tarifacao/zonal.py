@@ -6,7 +6,7 @@ from sympy import Symbol, lambdify
 
 from modulos.modelos.zonas import Zona
 from modulos.utils import dividir as d
-from modulos.utils import distribuir_valores_negativos
+from modulos.utils import distribuir_valores_negativos, cores
 
 class TarifasZonais:
     def __init__(self, sistema, tarifas_ctu, tarifas_ctn):
@@ -45,7 +45,7 @@ class TarifasZonais:
     def definir_zonas(self, n_zonas):
         zonas = KMeans(n_clusters=n_zonas).fit_predict(self.tarifas_ctu.reshape(-1, 1))
         for i in range(n_zonas):
-            zona = Zona(numero=i+1)
+            zona = Zona(numero=i+1, cor=cores[i])
             for barra in self.sistema.barras :
                 if zonas[barra.posicao] == i:
                     zona.barras.adicionar_barra(barra)

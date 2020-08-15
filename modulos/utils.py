@@ -21,3 +21,26 @@ def distribuir_valores_negativos(valores, referencia):
             return distribuir_valores_negativos(valores_corrigidos, referencia)
         else:
             return valores_corrigidos
+
+cores = [
+    "#FF0000",
+    "#00008B",
+    "#FFD700",
+    "#008000",
+    "#1E90FF",
+    "#8B4513",
+    "#6B8E23",
+    "#008B8B",
+    "#FF4500",
+    "#BDB76B",
+    "#696969",
+    "#C71585",
+    "#F08080",
+    "#32CD32",
+    "#DAA520",
+    "#FF00FF",
+    "#FF1493",
+    "#3CB371",
+    "#FA8072",
+    "#6495ED"
+]
