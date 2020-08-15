@@ -75,6 +75,7 @@ class TarifasNodais:
 
     # Gráfico das tarifas nodais
     def gerar_grafico_tarifas(self):
+        plt.clf()
         plt.xlabel('Barra')
         plt.ylabel('Tarifa Locacional')
         x_range = range(1, len(self.sistema.barras) + 1)

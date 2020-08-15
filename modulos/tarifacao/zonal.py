@@ -16,6 +16,7 @@ class TarifasZonais:
         self.tarifas_ctn = tarifas_ctn
         self.corrigido = []
         self.calcular_tarifas_zonais()
+        self.gerar_grafico_tarifas()
 
     def calcular_tarifas_zonais(self):
         numero_zonas = self.cotovelo()
@@ -52,6 +53,7 @@ class TarifasZonais:
             self.zonas.append(zona)
 
     def cotovelo(self):
+        plt.clf()
         _figura, eixo1 = plt.subplots()
         eixo1.set_xlabel('Número de zonas')
         eixo1.set_ylabel('Erro estimado')
@@ -108,3 +110,13 @@ class TarifasZonais:
         for zona in self.zonas:
             zona.encargos[f'{tipo}_corrigido'] = valores_corrigidos[zona.numero - 1]
             zona.tarifas[f'{tipo}_corrigido'] = d(valores_corrigidos[zona.numero - 1], numpy.sum(zona.barras.vetor_capacidade_instalada()) if tipo == 'geracao' else numpy.sum(zona.barras.vetor_potencia_consumida()))
+
+    # Gráfico das tarifas zonais
+    def gerar_grafico_tarifas(self):
+        plt.clf()
+        plt.xlabel('Barra')
+        plt.ylabel('Tarifa Locacional')
+        for zona in self.zonas:
+            for barra in zona.barras:
+                plt.scatter(barra.numero, self.tarifas_ctu[barra.posicao], color=zona.cor)
+        plt.savefig('template_saida/zonal.png')
