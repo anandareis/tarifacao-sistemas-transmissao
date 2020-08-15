@@ -90,10 +90,16 @@ class TarifasZonais:
 
         valores_curvatura = [calcular_curvatura(k) for k in eixo_x_continuo]
         eixo2.plot(eixo_x_continuo, valores_curvatura, 'red')
-        # plt.show()
-        # Retorna o ponto estimado para o cotovelo
+
+        # Calcula o ponto estimado para o cotovelo
         maior_curvatura = max(valores_curvatura)
-        return int(round(eixo_x_continuo[valores_curvatura.index(maior_curvatura)]))
+        cotovelo_aproximado = eixo_x_continuo[valores_curvatura.index(maior_curvatura)]
+        eixo2.axvline(cotovelo_aproximado, 0, 1, color='r', linestyle='--')
+
+        # Salva o plot como arquivo
+        plt.savefig('template_saida/cotovelo.png', bbox_inches = 'tight')
+
+        return int(round(cotovelo_aproximado))
 
     # Corrigir alocação negativa nas zonas
     def corrigir_alocacao_negativa(self, valores, tipo):

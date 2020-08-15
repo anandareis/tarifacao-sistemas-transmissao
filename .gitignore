@@ -1,3 +1,4 @@
 __pycache__/
 template_saida/index.html
+template_saida/*.png
 resultado.pdf

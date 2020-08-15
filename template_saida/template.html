@@ -152,6 +152,8 @@
     <!-- Tarifas Zonais -->
     <div class="conteudo">
         <h3>Tarifas Zonais</h3>
+        <p>O número de zonas diferentes para o sistema foi dado pelo cálculo da maior curvatura do gráfico de erro do K-médias (ou "método do cotovelo"):</p>
+        <img src="cotovelo.png">
         <p>A divisão do sistema em zonas se deu da seguinte forma:</p>
         {% for zona in zonas %}
         <p>Zona {{ zona.numero }}: Barras {{ zona.barras }}</p>
@@ -242,8 +244,6 @@
                 {% endif %}
             </div>
             {% endfor %}
-
-
         </div>
         <p>Engargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
         <p>Encargos totais para carga: <strong>R$ {{ f(barras.vetor_encargos_finais('carga') | sum) }}</strong></p>
