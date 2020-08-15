@@ -1,4 +1,6 @@
 import numpy
+import matplotlib.pyplot as plt
+
 from modulos.utils import distribuir_valores_negativos
 class TarifasNodais:
     def __init__(self, sistema, proporcao_geracao):
@@ -11,6 +13,7 @@ class TarifasNodais:
         self.tarifas_ctu = []
         self.corrigido = []
         self.calcular_tarifas_nodais()
+        self.gerar_grafico_tarifas()
 
     # Realizar todos os cálculos para tarifação nodal
     def calcular_tarifas_nodais(self):
@@ -69,3 +72,12 @@ class TarifasNodais:
         valores_corrigidos = distribuir_valores_negativos(valores, referencia_proporcao)
         for barra in self.sistema.barras:
             barra.encargos[tipo]['nodal_corrigido'] = valores_corrigidos[barra.posicao]
+
+    # Gráfico das tarifas nodais
+    def gerar_grafico_tarifas(self):
+        plt.xlabel('Barra')
+        plt.ylabel('Tarifa Locacional')
+        x_range = range(1, len(self.sistema.barras) + 1)
+        y_range = self.tarifas_ctu
+        plt.scatter(x_range, y_range)
+        plt.savefig('template_saida/nodal.png')
