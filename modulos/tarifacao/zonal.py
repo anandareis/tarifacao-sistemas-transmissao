@@ -6,6 +6,7 @@ from sympy import Symbol, lambdify
 
 from modulos.modelos.zonas import Zona
 from modulos.utils import dividir as d
+from modulos.utils import distribuir_valores_negativos
 
 class TarifasZonais:
     def __init__(self, sistema, tarifas_ctu, tarifas_ctn):
@@ -13,12 +14,21 @@ class TarifasZonais:
         self.zonas = []
         self.tarifas_ctu = tarifas_ctu
         self.tarifas_ctn = tarifas_ctn
+        self.corrigido = []
         self.calcular_tarifas_zonais()
 
     def calcular_tarifas_zonais(self):
         numero_zonas = self.cotovelo()
         self.definir_zonas(numero_zonas)
         self.definir_tarifas_encargos_zonais()
+        encargos_finais_geracao = numpy.array([zona.encargos['geracao'] for zona in self.zonas]) + numpy.array([numpy.sum(zona.barras.vetor_encargo_ctn('geracao')) for zona in self.zonas])
+        encargos_finais_carga = numpy.array([zona.encargos['carga'] for zona in self.zonas]) + numpy.array([numpy.sum(zona.barras.vetor_encargo_ctn('carga')) for zona in self.zonas])
+        if any(encargos_finais_geracao < 0):
+            self.corrigir_alocacao_negativa(encargos_finais_geracao, 'geracao')
+            self.corrigido.append('geracao')
+        if any(encargos_finais_carga < 0):
+            self.corrigir_alocacao_negativa(encargos_finais_carga, 'carga')
+            self.corrigido.append('carga')
 
     def definir_tarifas_encargos_zonais(self):
         for zona in self.zonas:
@@ -84,3 +94,11 @@ class TarifasZonais:
         # Retorna o ponto estimado para o cotovelo
         maior_curvatura = max(valores_curvatura)
         return int(round(eixo_x_continuo[valores_curvatura.index(maior_curvatura)]))
+
+    # Corrigir alocação negativa nas zonas
+    def corrigir_alocacao_negativa(self, valores, tipo):
+        referencia_proporcao = numpy.array([numpy.sum(zona.barras.vetor_capacidade_instalada()) for zona in self.zonas] if tipo == 'geracao' else [numpy.sum(zona.barras.vetor_potencia_consumida()) for zona in self.zonas])
+        valores_corrigidos = distribuir_valores_negativos(valores, referencia_proporcao)
+        for zona in self.zonas:
+            zona.encargos[f'{tipo}_corrigido'] = valores_corrigidos[zona.numero - 1]
+            zona.tarifas[f'{tipo}_corrigido'] = d(valores_corrigidos[zona.numero - 1], numpy.sum(zona.barras.vetor_capacidade_instalada()) if tipo == 'geracao' else numpy.sum(zona.barras.vetor_potencia_consumida()))

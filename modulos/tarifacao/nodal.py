@@ -1,5 +1,5 @@
 import numpy
-
+from modulos.utils import distribuir_valores_negativos
 class TarifasNodais:
     def __init__(self, sistema, proporcao_geracao):
         self.ro = (100-proporcao_geracao) / proporcao_geracao
@@ -65,19 +65,7 @@ class TarifasNodais:
 
     # Corrigir alocação negativa nos circuitos
     def corrigir_alocacao_negativa(self, valores, tipo):
-        valores_negativos = numpy.where(valores < 0, valores, 0)
-        valores_positivos = numpy.where(valores > 0, valores, 0)
-
-        montante_negativo = numpy.sum(valores_negativos)
-
         referencia_proporcao = self.sistema.barras.vetor_potencia_gerada() if tipo == 'geracao' else self.sistema.barras.vetor_potencia_consumida()
-        valores_proporcao = numpy.where(valores_positivos > 0, referencia_proporcao, 0)
-        proporcao = valores_proporcao / numpy.sum(valores_proporcao)
-
-        valores_corrigidos = valores_positivos + (montante_negativo*proporcao)
-
-        if any(valores_corrigidos < 0):
-            self.corrigir_alocacao_negativa(valores_corrigidos, tipo)
-        else:
-            for barra in self.sistema.barras:
-                barra.encargos[tipo]['nodal_corrigido'] = valores_corrigidos[barra.posicao]
+        valores_corrigidos = distribuir_valores_negativos(valores, referencia_proporcao)
+        for barra in self.sistema.barras:
+            barra.encargos[tipo]['nodal_corrigido'] = valores_corrigidos[barra.posicao]

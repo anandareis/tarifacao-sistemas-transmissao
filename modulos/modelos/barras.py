@@ -110,5 +110,17 @@ class Barras:
         else:
             return ctu_geracao + ctu_carga
 
+    # CTN total das barras
+    def vetor_encargo_ctn(self, tipo=None):
+        ctn_geracao = numpy.array([barra.encargos['geracao']['CTN'] for barra in self._elementos])
+        ctn_carga = numpy.array([barra.encargos['carga']['CTN'] for barra in self._elementos])
+
+        if tipo == 'geracao':
+            return ctn_geracao
+        elif tipo == 'carga':
+            return ctn_carga
+        else:
+            return ctn_geracao + ctn_carga
+
     def vetor_encargos_finais(self, tipo):
         return numpy.array([barra.encargos[tipo]['CTU'] + barra.encargos[tipo]['CTN'] for barra in self._elementos])
