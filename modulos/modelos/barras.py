@@ -3,12 +3,16 @@ import numpy
 import sys
 
 class Barra:
-    def __init__(self, numero, potencia_gerada, capacidade_instalada, potencia_consumida):
+    def __init__(self, numero, potencia_gerada, capacidade_instalada, potencia_consumida, coordenada_X, coordenada_Y):
         self.numero = numero
         self.potencia_gerada = potencia_gerada
         self.capacidade_instalada = capacidade_instalada
         self.potencia_consumida = potencia_consumida
         self.posicao = numero - 1
+        self.coordenadas = {
+            'X': coordenada_X,
+            'Y': coordenada_Y
+        }
         self.encargos = {
             'geracao': {
                 'CTU': 0,
@@ -50,7 +54,9 @@ class Barras:
                 numero=int(barra['Num']),
                 potencia_gerada=barra['Potg_MW'],
                 capacidade_instalada=barra['Capac_Inst_MW'],
-                potencia_consumida=barra['Potc_MW']
+                potencia_consumida=barra['Potc_MW'],
+                coordenada_X=barra['coord_X'],
+                coordenada_Y=barra['coord_Y']
             ))
         return barras
 

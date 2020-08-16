@@ -35,13 +35,14 @@ Os testes disponíves até o momento são:
 Para executar o programa fornecendo como entrada os dados de qualquer sistema, é necessário possuir os arquivos com os dados das barras e circuitos do sistema em formato CSV.
 Os dados das barras devem estar dispostos da seguinte forma:
 ```
-Num;Potg_MW;Capac_Inst_MW;Potc_MW
+Num;Potg_MW;Capac_Inst_MW;Potc_MW;coord_X;coord_Y
 ```
 Onde:
 - Num: Número da barra. Deve estar em sequência crescente, iniciado em 1;
 - Potg_MW: Potência gerada pela barra, em MW;
 - Capac_Inst_MW: Capacidade total instalada na barra, em MW.
 - Potc_MW: Potência consumida pela barra, em MW;
+- coord_X, coord_Y: Coordenadas X e Y do posicionamento da barra (para geração do gráfico posicional)
 
 Os dados das barras devem estar dispostos da seguinte forma:
 ```
