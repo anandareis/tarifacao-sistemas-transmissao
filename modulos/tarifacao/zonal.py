@@ -1,4 +1,5 @@
 import numpy
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from sklearn.cluster import KMeans
@@ -57,10 +58,9 @@ class TarifasZonais:
         plt.clf()
         _figura, eixo1 = plt.subplots()
         eixo1.set_xlabel('Número de zonas')
-        eixo1.set_ylabel('Erro estimado')
+        eixo1.set_ylabel('Erro estimado do K-Médias')
         eixo2 = eixo1.twinx()
-        eixo2.set_ylabel('Curvatura', color='red')
-        eixo2.tick_params(axis='y', labelcolor='red')
+        eixo2.set_ylabel('Curvatura')
 
         numero_zonas = range(2, len(self.sistema.barras))
         eixo_x_continuo = numpy.linspace(2, len(self.sistema.barras), len(self.sistema.barras) *10)
@@ -99,8 +99,12 @@ class TarifasZonais:
         cotovelo_aproximado = eixo_x_continuo[valores_curvatura.index(maior_curvatura)]
         eixo2.axvline(cotovelo_aproximado, 0, 1, color='r', linestyle='--')
 
+        legenda = plt.legend(handles=[
+            mpatches.Patch(color='yellow', label='Erro quadrático'),
+            mpatches.Patch(color='red', label='Curvatura')
+        ], loc='upper left', bbox_to_anchor=(1.12, 1))
         # Salva o plot como arquivo
-        plt.savefig('template_saida/cotovelo.png', bbox_inches = 'tight')
+        plt.savefig('template_saida/cotovelo.png', bbox_extra_artists=(legenda,), bbox_inches = 'tight')
 
         return int(round(cotovelo_aproximado))
 
@@ -117,17 +121,23 @@ class TarifasZonais:
         plt.clf()
         plt.xlabel('Barra')
         plt.ylabel('Tarifa Locacional')
+        handles = []
         for zona in self.zonas:
             for barra in zona.barras:
                 plt.scatter(barra.numero, self.tarifas_ctu[barra.posicao], color=zona.cor)
-        plt.savefig('template_saida/zonal.png')
+            handles.append(mpatches.Patch(color=zona.cor, label=f'Zona {zona.numero}'))
+        legenda = plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(1.02, 1))
+        plt.savefig('template_saida/zonal.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
 
     def gerar_grafico_posicional(self):
         plt.clf()
         plt.xticks([])
         plt.yticks([])
+        handles = []
         for zona in self.zonas:
             for barra in zona.barras:
                 plt.scatter(barra.coordenadas['X'], barra.coordenadas['Y'], color=zona.cor, s=100)
                 plt.annotate(barra.numero, (barra.coordenadas['X'], barra.coordenadas['Y']), xytext=(5, 5), textcoords='offset pixels')
-        plt.savefig('template_saida/posicional.png')
+            handles.append(mpatches.Patch(color=zona.cor, label=f'Zona {zona.numero}'))
+        legenda = plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(1.02, 1))
+        plt.savefig('template_saida/posicional.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
