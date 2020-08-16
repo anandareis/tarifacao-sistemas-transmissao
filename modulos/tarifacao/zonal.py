@@ -52,6 +52,7 @@ class TarifasZonais:
             for barra in self.sistema.barras :
                 if zonas[barra.posicao] == i:
                     zona.barras.adicionar_barra(barra)
+                    barra.zona = zona
             self.zonas.append(zona)
 
     def cotovelo(self):

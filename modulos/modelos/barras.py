@@ -9,6 +9,7 @@ class Barra:
         self.capacidade_instalada = capacidade_instalada
         self.potencia_consumida = potencia_consumida
         self.posicao = numero - 1
+        self.zona = None
         self.coordenadas = {
             'X': coordenada_X,
             'Y': coordenada_Y
