@@ -146,7 +146,7 @@
             </div>
             {% endfor %}
         </div>
-        <p>Engargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
+        <p>Encargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
         <p>Encargos totais para carga: <strong>R$ {{ f(barras.vetor_encargos_finais('carga') | sum) }}</strong></p>
     </div>
     <!-- Tarifas Zonais -->
@@ -162,6 +162,8 @@
         {% endfor %}
         <p>Essa divisão pode ser visualizada no próprio gráfico das tarifas, agora representando cada uma das zonas por uma cor diferente:</p>
         <img src="zonal.png">
+        <p>A figura abaixo oferece uma visualização da disposição das barras através das coordenadas fornecidas, coloridas de acordo com suas respectivas zonas.</p>
+        <img src="posicional.png">
 
         <p>As tarifas do CTU são calculadas por zona, como mostrado na tabela.</p>
         <p>As tarifas do CTN são:</p>
@@ -209,8 +211,6 @@
             </div>
             {% endfor %}
         </div>
-        <p>Engargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
-        <p>Encargos totais para carga: <strong>R$ {{ f(barras.vetor_encargos_finais('carga') | sum) }}</strong></p>
     </div>
     {% if corrigido_zonal %}
         <div class="conteudo">
@@ -249,7 +249,7 @@
             </div>
             {% endfor %}
         </div>
-        <p>Engargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
+        <p>Encargos totais para geração: <strong>R$ {{ f(barras.vetor_encargos_finais('geracao') | sum) }}</strong></p>
         <p>Encargos totais para carga: <strong>R$ {{ f(barras.vetor_encargos_finais('carga') | sum) }}</strong></p>
     </div>
 </html>

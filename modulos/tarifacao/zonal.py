@@ -17,6 +17,7 @@ class TarifasZonais:
         self.corrigido = []
         self.calcular_tarifas_zonais()
         self.gerar_grafico_tarifas()
+        self.gerar_grafico_posicional()
 
     def calcular_tarifas_zonais(self):
         numero_zonas = self.cotovelo()
@@ -120,3 +121,13 @@ class TarifasZonais:
             for barra in zona.barras:
                 plt.scatter(barra.numero, self.tarifas_ctu[barra.posicao], color=zona.cor)
         plt.savefig('template_saida/zonal.png')
+
+    def gerar_grafico_posicional(self):
+        plt.clf()
+        plt.xticks([])
+        plt.yticks([])
+        for zona in self.zonas:
+            for barra in zona.barras:
+                plt.scatter(barra.coordenadas['X'], barra.coordenadas['Y'], color=zona.cor, s=100)
+                plt.annotate(barra.numero, (barra.coordenadas['X'], barra.coordenadas['Y']), xytext=(5, 5), textcoords='offset pixels')
+        plt.savefig('template_saida/posicional.png')
