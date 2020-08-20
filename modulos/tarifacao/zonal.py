@@ -121,7 +121,7 @@ class TarifasZonais:
     def gerar_grafico_tarifas(self):
         plt.clf()
         plt.xlabel('Barra')
-        plt.ylabel('Tarifa Locacional')
+        plt.ylabel('Tarifa Locacional [R$/MW.ano]')
         handles = []
         for zona in self.zonas:
             for barra in zona.barras:

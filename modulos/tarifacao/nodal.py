@@ -77,7 +77,7 @@ class TarifasNodais:
     def gerar_grafico_tarifas(self):
         plt.clf()
         plt.xlabel('Barra')
-        plt.ylabel('Tarifa Locacional')
+        plt.ylabel('Tarifa Locacional [R$/MW.ano]')
         x_range = range(1, len(self.sistema.barras) + 1)
         y_range = self.tarifas_ctu
         plt.scatter(x_range, y_range)
