@@ -130,6 +130,11 @@ class TarifasZonais:
         legenda = plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(1.02, 1))
         plt.savefig('template_saida/zonal.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
 
+        for zona in self.zonas:
+            plt.axhline(zona.tarifas['geracao'], 0, 1, color=zona.cor, linestyle='--')
+            plt.axhline(-zona.tarifas['carga'], 0, 1, color=zona.cor, linestyle=':')
+        plt.savefig('template_saida/zonal_tarifas.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
+
     def gerar_grafico_posicional(self):
         plt.clf()
         plt.xticks([])
