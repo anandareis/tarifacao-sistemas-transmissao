@@ -4,7 +4,7 @@ from jinja2 import Template
 from modulos.sistema import Sistema
 from modulos.tarifacao.nodal import TarifasNodais
 from modulos.tarifacao.zonal import TarifasZonais
-from modulos.utils import formatar_moeda, dividir
+from modulos.utils import formatar_decimal, dividir
 from weasyprint import HTML, CSS
 
 parser = argparse.ArgumentParser(description='Calcula as tarifas nodais e zonais para um sistema de transmissão de energia', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -73,7 +73,7 @@ saida = template.render(
     corrigido_nodal = tarifacao_nodal.corrigido,
     corrigido_zonal = tarifacao_zonal.corrigido,
     zonas = tarifacao_zonal.zonas,
-    f = formatar_moeda,
+    f = formatar_decimal,
     d = dividir
     )
 

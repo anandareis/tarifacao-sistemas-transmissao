@@ -1,7 +1,7 @@
 import numpy
 
-def formatar_moeda(valor):
-    return "{0:.2f}".format(round(valor, 2))
+def formatar_decimal(valor, casas=2):
+    return "{0:.{c}f}".format(round(valor, casas), c=casas)
 
 def dividir(dividendo, divisor):
     return dividendo / divisor if divisor != 0 else 0
