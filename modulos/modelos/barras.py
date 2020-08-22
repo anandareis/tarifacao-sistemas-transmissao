@@ -56,9 +56,9 @@ class Barras:
         for _, barra in tabela_barras.iterrows():
             barras.adicionar_barra(Barra(
                 numero=int(barra['Num']),
-                potencia_gerada=barra['Potg_MW'],
-                capacidade_instalada=barra['Capac_Inst_MW'],
-                potencia_consumida=barra['Potc_MW'],
+                potencia_gerada=float(barra['Potg_MW']),
+                capacidade_instalada=float(barra['Capac_Inst_MW']),
+                potencia_consumida=float(barra['Potc_MW']),
                 coordenada_X=barra['coord_X'],
                 coordenada_Y=barra['coord_Y']
             ))
@@ -87,6 +87,7 @@ class Barras:
             print('O valor obtido para a geração de referência foi negativo.')
             print('Defina uma barra de referência com maior valor de potência gerada.')
             sys.exit(4)
+
         if geracao_referencia > self.barra_referencia.capacidade_instalada:
             print('ERRO: A barra de referência definida não pode ser usada para este sistema.')
             print('O valor obtido para a geração de referência excede a capacidade instalada.')
