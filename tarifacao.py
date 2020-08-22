@@ -49,9 +49,7 @@ try:
         proporcao_geracao=args.proporcao_geracao
     )
     tarifacao_zonal = TarifasZonais(
-        sistema=sistema,
-        tarifas_ctu = tarifacao_nodal.tarifas_ctu,
-        tarifas_ctn = tarifacao_nodal.tarifas_ctn
+        sistema=sistema
     )
 
 except FileNotFoundError:
@@ -69,12 +67,8 @@ with open('./template_saida/template.html') as html_entrada:
 saida = template.render(
     barras=sistema.barras,
     circuitos=sistema.circuitos,
-    ctn = tarifacao_nodal.tarifas_ctn,
-    corrigido_nodal = tarifacao_nodal.corrigido,
-    corrigido_zonal = tarifacao_zonal.corrigido,
     zonas = tarifacao_zonal.zonas,
-    f = formatar_decimal,
-    d = dividir
+    f = formatar_decimal
     )
 
 with open('./template_saida/index.html', 'w+') as html_saida:

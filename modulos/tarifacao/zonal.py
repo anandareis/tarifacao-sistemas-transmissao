@@ -10,12 +10,9 @@ from modulos.utils import dividir as d
 from modulos.utils import distribuir_valores_negativos, cores
 
 class TarifasZonais:
-    def __init__(self, sistema, tarifas_ctu, tarifas_ctn):
+    def __init__(self, sistema):
         self.sistema = sistema
         self.zonas = []
-        self.tarifas_ctu = tarifas_ctu
-        self.tarifas_ctn = tarifas_ctn
-        self.corrigido = []
         self.calcular_tarifas_zonais()
         self.gerar_grafico_tarifas()
         self.gerar_grafico_posicional()
@@ -24,29 +21,26 @@ class TarifasZonais:
         numero_zonas = self.cotovelo()
         self.definir_zonas(numero_zonas)
         self.definir_tarifas_encargos_zonais()
-        encargos_finais_geracao = numpy.array([zona.encargos['geracao'] for zona in self.zonas]) + numpy.array([numpy.sum(zona.barras.vetor_encargo_ctn('geracao')) for zona in self.zonas])
-        encargos_finais_carga = numpy.array([zona.encargos['carga'] for zona in self.zonas]) + numpy.array([numpy.sum(zona.barras.vetor_encargo_ctn('carga')) for zona in self.zonas])
-        if any(encargos_finais_geracao < 0):
-            self.corrigir_alocacao_negativa(encargos_finais_geracao, 'geracao')
-            self.corrigido.append('geracao')
-        if any(encargos_finais_carga < 0):
-            self.corrigir_alocacao_negativa(encargos_finais_carga, 'carga')
-            self.corrigido.append('carga')
+        encargos_totais_geracao = numpy.array([zona.encargo_total('geracao') for zona in self.zonas])
+        encargos_totais_carga = numpy.array([zona.encargo_total('carga') for zona in self.zonas])
+        self.corrigir_alocacao_negativa(encargos_totais_geracao, 'geracao')
+        self.corrigir_alocacao_negativa(encargos_totais_carga, 'carga')
 
     def definir_tarifas_encargos_zonais(self):
         for zona in self.zonas:
-            ctu_geracao = numpy.sum(zona.barras.vetor_encargo_ctu(tipo='geracao'))
-            ctu_carga = numpy.sum(zona.barras.vetor_encargo_ctu(tipo='carga'))
+            ctu_geracao = numpy.sum(zona.barras.vetor_encargos('geracao', 'locacional_nodal'))
+            ctu_carga = numpy.sum(zona.barras.vetor_encargos('carga', 'locacional_nodal'))
             potencia_instalada = numpy.sum(zona.barras.vetor_capacidade_instalada())
             potencia_consumida = numpy.sum(zona.barras.vetor_potencia_consumida())
 
-            zona.encargos['geracao'] = ctu_geracao
-            zona.encargos['carga'] = ctu_carga
-            zona.tarifas['geracao'] = d(ctu_geracao, potencia_instalada)
-            zona.tarifas['carga'] = d(ctu_carga, potencia_consumida)
+            tarifa_geracao = d(ctu_geracao, potencia_instalada)
+            tarifa_carga = d(ctu_carga, potencia_consumida)
+            for barra in zona.barras:
+                barra.custos.atualizar_tarifa(tarifa_geracao, 'geracao', 'locacional_zonal')
+                barra.custos.atualizar_tarifa(tarifa_carga, 'carga', 'locacional_zonal')
 
     def definir_zonas(self, n_zonas):
-        zonas = KMeans(n_clusters=n_zonas).fit_predict(self.tarifas_ctu.reshape(-1, 1))
+        zonas = KMeans(n_clusters=n_zonas).fit_predict(self.sistema.barras.vetor_tarifas('geracao', 'locacional_nodal').reshape(-1, 1))
         for i in range(n_zonas):
             zona = Zona(numero=i+1, cor=cores[i])
             for barra in self.sistema.barras :
@@ -69,7 +63,7 @@ class TarifasZonais:
         # Erros do K-médias
         erros = []
         for n in numero_zonas:
-            kmeans = KMeans(n_clusters=n).fit(self.tarifas_ctu.reshape(-1,1))
+            kmeans = KMeans(n_clusters=n).fit(self.sistema.barras.vetor_tarifas('geracao', 'locacional_nodal').reshape(-1,1))
             erros.append(kmeans.inertia_)
         eixo1.scatter(numero_zonas, erros)
 
@@ -110,12 +104,11 @@ class TarifasZonais:
         return int(round(cotovelo_aproximado))
 
     # Corrigir alocação negativa nas zonas
-    def corrigir_alocacao_negativa(self, valores, tipo):
-        referencia_proporcao = numpy.array([numpy.sum(zona.barras.vetor_capacidade_instalada()) for zona in self.zonas] if tipo == 'geracao' else [numpy.sum(zona.barras.vetor_potencia_consumida()) for zona in self.zonas])
+    def corrigir_alocacao_negativa(self, valores, natureza):
+        referencia_proporcao = numpy.array([zona.obter_valor_referencia(natureza) for zona in self.zonas])
         valores_corrigidos = distribuir_valores_negativos(valores, referencia_proporcao)
         for zona in self.zonas:
-            zona.encargos[f'{tipo}_corrigido'] = valores_corrigidos[zona.numero - 1]
-            zona.tarifas[f'{tipo}_corrigido'] = d(valores_corrigidos[zona.numero - 1], numpy.sum(zona.barras.vetor_capacidade_instalada()) if tipo == 'geracao' else numpy.sum(zona.barras.vetor_potencia_consumida()))
+            zona.definir_custos_finais(valores_corrigidos[zona.posicao], natureza)
 
     # Gráfico das tarifas zonais
     def gerar_grafico_tarifas(self):
@@ -125,7 +118,7 @@ class TarifasZonais:
         handles = []
         for zona in self.zonas:
             for barra in zona.barras:
-                plt.scatter(barra.numero, self.tarifas_ctu[barra.posicao], color=zona.cor)
+                plt.scatter(barra.numero, barra.custos.obter_tarifa('geracao', 'locacional_nodal'), color=zona.cor)
             handles.append(mpatches.Patch(color=zona.cor, label=f'Zona {zona.numero}'))
         legenda = plt.legend(handles=handles, loc='upper left', bbox_to_anchor=(1.02, 1))
         plt.savefig('template_saida/zonal.png', bbox_extra_artists=(legenda,), bbox_inches='tight')

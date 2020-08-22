@@ -2,6 +2,8 @@ import pandas
 import numpy
 import sys
 
+from modulos.modelos.custos import Custos
+
 class Barra:
     def __init__(self, numero, potencia_gerada, capacidade_instalada, potencia_consumida, coordenada_X, coordenada_Y):
         self.numero = numero
@@ -10,6 +12,7 @@ class Barra:
         self.potencia_consumida = potencia_consumida
         self.posicao = numero - 1
         self.zona = None
+        self.custos = Custos(self)
         self.coordenadas = {
             'X': coordenada_X,
             'Y': coordenada_Y
@@ -65,6 +68,8 @@ class Barras:
         self._elementos.append(barra)
 
     def obter_barra(self, numero):
+        if numero == 0:
+            return self._elementos[0]
         for barra in self._elementos:
             if barra.numero == numero:
                 return barra
@@ -105,29 +110,8 @@ class Barras:
     def vetor_capacidade_instalada(self):
         return numpy.array([barra.capacidade_instalada for barra in self._elementos])
 
-    # CTU total das barras
-    def vetor_encargo_ctu(self, tipo=None):
-        ctu_geracao = numpy.array([barra.encargos['geracao']['CTU'] for barra in self._elementos])
-        ctu_carga = numpy.array([barra.encargos['carga']['CTU'] for barra in self._elementos])
+    def vetor_encargos(self, natureza, tipo):
+        return numpy.array([barra.custos.obter_encargo(natureza, tipo) for barra in self._elementos])
 
-        if tipo == 'geracao':
-            return ctu_geracao
-        elif tipo == 'carga':
-            return ctu_carga
-        else:
-            return ctu_geracao + ctu_carga
-
-    # CTN total das barras
-    def vetor_encargo_ctn(self, tipo=None):
-        ctn_geracao = numpy.array([barra.encargos['geracao']['CTN'] for barra in self._elementos])
-        ctn_carga = numpy.array([barra.encargos['carga']['CTN'] for barra in self._elementos])
-
-        if tipo == 'geracao':
-            return ctn_geracao
-        elif tipo == 'carga':
-            return ctn_carga
-        else:
-            return ctn_geracao + ctn_carga
-
-    def vetor_encargos_finais(self, tipo):
-        return numpy.array([barra.encargos[tipo]['CTU'] + barra.encargos[tipo]['CTN'] for barra in self._elementos])
+    def vetor_tarifas(self, natureza, tipo):
+        return numpy.array([barra.custos.obter_tarifa(natureza, tipo) for barra in self._elementos])
