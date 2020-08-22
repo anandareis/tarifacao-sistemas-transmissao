@@ -16,6 +16,16 @@ $ pip install -r requirements.txt --user
 É recomendado utilizar um ambiente virtual para a instalação e execução do programa.
 Para mais informações sobre ambientes virtuais, veja a [documentação oficial](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
 
+### ❗ Instalando no Windows
+
+O software utiliza o [WeasyPrint](https://weasyprint.org/) para gerar o PDF com o relatório.
+
+A instalação para windows requer um passo extra, descrito na [documentação oficial](https://weasyprint.readthedocs.io/en/latest/install.html#windows)
+no passo 4 -> Instalar as bibliotecas do GTK+.
+
+É necessário instalar o GTK+ (tarefa mais simples se o Python instalado em seu sistema for a versão de 64bits),
+e garantir que o diretório onde o GTK+ foi instalado esteja no PATH do sistema.
+
 ## Executando um sistema de teste
 
 Para executar o programa usando como entrada um dos sistemas de teste disponíveis com
