@@ -30,6 +30,12 @@
                 <div class="tabela-celula">{{ barra.potencia_consumida }}</div>
             </div>
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula">{{ barras.vetor_capacidade_instalada() | sum }}</div>
+                <div class="tabela-celula">{{ barras.vetor_potencia_gerada() | sum }}</div>
+                <div class="tabela-celula">{{ barras.vetor_potencia_consumida() | sum }}</div>
+            </div>
         </div>
     </div>
     <div class="conteudo">
@@ -87,6 +93,13 @@
             </div>
             {% endif %}
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula"> </div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'locacional_nodal') | sum) }}</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'selo') | sum) }}</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'total_nodal') | sum) }}</div>
+            </div>
         </div>
     </div>
     <div class="conteudo">
@@ -110,6 +123,13 @@
             </div>
             {% endif %}
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula"> </div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'locacional_nodal') | sum) }}</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'selo') | sum) }}</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'total_nodal') | sum) }}</div>
+            </div>
         </div>
     </div>
     <div class="conteudo">
@@ -134,6 +154,13 @@
                 <div class="tabela-celula">{{ f(barra.custos.obter_tarifa('carga', 'final_nodal'), 3) }}</div>
             </div>
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'final_nodal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'final_nodal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+            </div>
         </div>
     </div>
     <!-- Tarifas Zonais -->
@@ -176,6 +203,13 @@
                 <div class="tabela-celula">{{ f(zona.barras.obter_barra(0).custos.obter_tarifa('carga', 'locacional_zonal'), 3) }}</div>
             </div>
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'locacional_zonal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'locacional_zonal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+            </div>
         </div>
     </div>
     <div class="conteudo">
@@ -197,6 +231,13 @@
                 <div class="tabela-celula">{{ f(zona.barras.obter_barra(0).custos.obter_tarifa('carga', 'total_zonal'), 3) }}</div>
             </div>
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'total_zonal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'total_zonal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+            </div>
         </div>
     </div>
     {% if corrigido_zonal %}
@@ -223,6 +264,13 @@
                 <div class="tabela-celula">{{ f(zona.barras.obter_barra(0).custos.obter_tarifa('carga', 'final_zonal'), 3) }}</div>
             </div>
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'final_zonal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'final_zonal') | sum) }}</div>
+                <div class="tabela-celula"> </div>
+            </div>
         </div>
     </div>
     <div class="conteudo">
@@ -242,5 +290,11 @@
                 <div class="tabela-celula">{{ f(barra.custos.obter_encargo('carga', 'final_zonal')) }}</div>
             </div>
             {% endfor %}
+            <div class="tabela-totais tabela-linha">
+                <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula"> </div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'final_zonal') | sum) }}</div>
+                <div class="tabela-celula">{{ f(barras.vetor_encargos('carga', 'final_zonal') | sum) }}</div>
+            </div>
         </div>
 </html>

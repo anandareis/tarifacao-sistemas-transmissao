@@ -37,6 +37,11 @@ img{
     font-weight: bold;
 }
 
+.tabela-totais {
+    border-top: 1px solid black;
+    font-weight: bold;
+}
+
 .tabela-linha{
     display: flex;
     justify-content: stretch;
