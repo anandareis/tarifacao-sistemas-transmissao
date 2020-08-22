@@ -57,8 +57,10 @@ class TarifasZonais:
         eixo2 = eixo1.twinx()
         eixo2.set_ylabel('Curvatura')
 
-        numero_zonas = range(2, len(self.sistema.barras))
-        eixo_x_continuo = numpy.linspace(2, len(self.sistema.barras), len(self.sistema.barras) *10)
+
+        maximo_zonas = min(len(self.sistema.barras), 30)
+        numero_zonas = range(2, maximo_zonas)
+        eixo_x_continuo = numpy.linspace(2, maximo_zonas, maximo_zonas *10)
 
         # Erros do K-médias
         erros = []
@@ -70,7 +72,7 @@ class TarifasZonais:
         # Linha de tendência
         def funcao_exponencial_negativa(x, a, b, c):
             return a*x**(-b)+c
-        popt, _pcov = curve_fit(funcao_exponencial_negativa, numero_zonas, erros)
+        popt, _pcov = curve_fit(funcao_exponencial_negativa, numero_zonas, erros, p0=(1, 0.5, 0))
         x = Symbol('x')
         equacao_tendencia = popt[0]*x**(-popt[1])+popt[2]
         funcao_tendencia = lambdify(x, equacao_tendencia)
@@ -97,7 +99,7 @@ class TarifasZonais:
         legenda = plt.legend(handles=[
             mpatches.Patch(color='yellow', label='Erro quadrático'),
             mpatches.Patch(color='red', label='Curvatura')
-        ], loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=10)
+        ], loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=2)
         # Salva o plot como arquivo
         plt.savefig('template_saida/cotovelo.png', bbox_extra_artists=(legenda,), bbox_inches = 'tight')
 
@@ -120,7 +122,7 @@ class TarifasZonais:
             for barra in zona.barras:
                 plt.scatter(barra.numero, barra.custos.obter_tarifa('geracao', 'locacional_nodal'), color=zona.cor)
             handles.append(mpatches.Patch(color=zona.cor, label=f'Zona {zona.numero}'))
-        legenda = plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=10)
+        legenda = plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=6)
         plt.savefig('template_saida/zonal.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
 
     def gerar_grafico_posicional(self):
@@ -133,5 +135,5 @@ class TarifasZonais:
                 plt.scatter(barra.coordenadas['X'], barra.coordenadas['Y'], color=zona.cor, s=100)
                 plt.annotate(barra.numero, (barra.coordenadas['X'], barra.coordenadas['Y']), xytext=(5, 5), textcoords='offset pixels')
             handles.append(mpatches.Patch(color=zona.cor, label=f'Zona {zona.numero}'))
-        legenda = plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=10)
+        legenda = plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=6)
         plt.savefig('template_saida/posicional.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
