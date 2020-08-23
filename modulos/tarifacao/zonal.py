@@ -16,6 +16,7 @@ class TarifasZonais:
         self.calcular_tarifas_zonais()
         self.gerar_grafico_tarifas()
         self.gerar_grafico_posicional()
+        self.gerar_graficos_zonas()
 
     def calcular_tarifas_zonais(self):
         numero_zonas = self.cotovelo()
@@ -137,3 +138,24 @@ class TarifasZonais:
             handles.append(mpatches.Patch(color=zona.cor, label=f'Zona {zona.numero}'))
         legenda = plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=6)
         plt.savefig('template_saida/posicional.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
+
+    def gerar_graficos_zonas(self):
+        plt.clf()
+        plt.title('Tarifas de Geração')
+        plt.xlabel('Zonas')
+        plt.ylabel('Tarifa Locacional [R$/MW.ano]')
+        for zona in self.zonas:
+            plt.scatter(zona.numero, zona.barras.obter_barra(0).custos.obter_tarifa('geracao', 'locacional_zonal'), c=zona.cor, s=128, alpha=0.5)
+            for barra in zona.barras:
+                plt.scatter(zona.numero, barra.custos.obter_tarifa('geracao', 'locacional_nodal'), c=zona.cor, marker='x')
+        plt.savefig('template_saida/zonal_geracao.png')
+
+        plt.clf()
+        plt.title('Tarifas de Carga')
+        plt.xlabel('Zonas')
+        plt.ylabel('Tarifa Locacional [R$/MW.ano]')
+        for zona in self.zonas:
+            plt.scatter(zona.numero, zona.barras.obter_barra(0).custos.obter_tarifa('carga', 'locacional_zonal'), c=zona.cor, s=128, alpha=0.5)
+            for barra in zona.barras:
+                plt.scatter(zona.numero, -barra.custos.obter_tarifa('carga', 'locacional_nodal'), c=zona.cor, marker='x')
+        plt.savefig('template_saida/zonal_carga.png')
