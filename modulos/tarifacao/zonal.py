@@ -129,6 +129,9 @@ class TarifasZonais:
             for barra in zona.barras:
                 plt.scatter(barra.numero, barra.custos.obter_tarifa('geracao', 'locacional_nodal'), color=zona.cor)
             handles.append(mpatches.Patch(color=zona.cor, label=f'Zona {zona.numero}'))
+            minimo = min(zona.barras.vetor_tarifas('geracao', 'locacional_nodal'))
+            maximo = max(zona.barras.vetor_tarifas('geracao', 'locacional_nodal'))
+            plt.axhspan(minimo, maximo, 0, 1, color=zona.cor, alpha=0.3)
         legenda = plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=6)
         plt.savefig('template_saida/zonal.png', bbox_extra_artists=(legenda,), bbox_inches='tight')
 
