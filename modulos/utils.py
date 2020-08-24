@@ -1,6 +1,8 @@
 import numpy
 
-def formatar_decimal(valor, casas=2):
+def formatar_decimal(valor, casas=2, tratar_zero=False):
+    if tratar_zero and valor == 0:
+        return '---'
     return "{0:.{c}f}".format(round(valor, casas), c=casas)
 
 def dividir(dividendo, divisor):
