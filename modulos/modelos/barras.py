@@ -17,18 +17,13 @@ class Barra:
             'X': coordenada_X,
             'Y': coordenada_Y
         }
-        self.encargos = {
-            'geracao': {
-                'CTU': 0,
-                'CTN': 0,
-                'nodal_corrigido': 0
-            },
-            'carga': {
-                'CTU': 0,
-                'CTN': 0,
-                'nodal_corrigido': 0
-            }
-        }
+        if self.capacidade_instalada != 0 and self.potencia_consumida != 0:
+            self.tipo = 'G|C'
+        elif self.capacidade_instalada != 0:
+            self.tipo = 'G'
+        else:
+            self.tipo = 'C'
+
 
     @property
     def potencia_ativa(self):
@@ -116,3 +111,6 @@ class Barras:
 
     def vetor_tarifas(self, natureza, tipo):
         return numpy.array([barra.custos.obter_tarifa(natureza, tipo) for barra in self._elementos])
+
+    def vetor_tipos(self):
+        return [barra.tipo for barra in self._elementos]

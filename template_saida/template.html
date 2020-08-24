@@ -189,6 +189,7 @@
         <div class="tabela">
             <div class="tabela-cabecalho tabela-linha">
                 <div class="tabela-celula">Zona</div>
+                <div class="tabela-celula">Tipo</div>
                 <div class="tabela-celula">Encargo Locacional de Geração</div>
                 <div class="tabela-celula">Encargo Selo de Geração</div>
                 <div class="tabela-celula">Tarifa Locacional de Geração</div>
@@ -199,6 +200,7 @@
             {% for zona in zonas %}
             <div class="tabela-linha">
                 <div class="tabela-celula">{{ zona.numero }}</div>
+                <div class="tabela-celula">{{ zona.tipo }}</div>
                 <div class="tabela-celula">{{ f(zona.barras.vetor_encargos('geracao', 'locacional_zonal') | sum) }}</div>
                 <div class="tabela-celula">{{ f(zona.barras.vetor_encargos('geracao', 'selo') | sum) }}</div>
                 <div class="tabela-celula">{{ f(zona.barras.obter_barra(0).custos.obter_tarifa('geracao', 'locacional_zonal'), 3) }}</div>
@@ -209,6 +211,7 @@
             {% endfor %}
             <div class="tabela-totais tabela-linha">
                 <div class="tabela-celula">Totais</div>
+                <div class="tabela-celula"> </div>
                 <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'locacional_zonal') | sum) }}</div>
                 <div class="tabela-celula">{{ f(barras.vetor_encargos('geracao', 'selo') | sum) }}</div>
                 <div class="tabela-celula"> </div>

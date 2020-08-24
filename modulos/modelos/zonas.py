@@ -8,6 +8,14 @@ class Zona:
         self.barras = Barras()
         self.cor = cor
         self.posicao = numero - 1
+        self.tipo = ''
+
+    def definir_tipo(self):
+        tipos = self.barras.vetor_tipos()
+        if 'G|C' in tipos or ('G' in tipos and 'C' in tipos):
+            self.tipo = 'G|C'
+        else:
+            self.tipo = tipos[0]
 
     def encargo_total(self, natureza):
         return numpy.sum([barra.custos.obter_encargo(natureza, 'total_zonal') for barra in self.barras])
