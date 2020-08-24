@@ -13,6 +13,7 @@ class TarifasZonais:
     def __init__(self, sistema):
         self.sistema = sistema
         self.zonas = []
+        self.corrigido = False
         self.calcular_tarifas_zonais()
         self.gerar_grafico_tarifas()
         self.gerar_grafico_posicional()
@@ -47,6 +48,7 @@ class TarifasZonais:
                 if zonas[barra.posicao] == i:
                     zona.barras.adicionar_barra(barra)
                     barra.zona = zona
+            zona.definir_tipo()
             self.zonas.append(zona)
 
     def cotovelo(self):
@@ -107,6 +109,8 @@ class TarifasZonais:
 
     # Corrigir alocação negativa nas zonas
     def corrigir_alocacao_negativa(self, valores, natureza):
+        if any(valores < 0):
+            self.corrigido = True
         referencia_proporcao = numpy.array([zona.obter_valor_referencia(natureza) for zona in self.zonas])
         valores_corrigidos = distribuir_valores_negativos(valores, referencia_proporcao)
         for zona in self.zonas:

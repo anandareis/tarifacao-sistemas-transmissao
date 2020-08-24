@@ -133,10 +133,10 @@
         </div>
     </div>
     <div class="conteudo">
-        {% if corrigido_nodal %}
-        <p>Para esse cenário operativo, foi necessário fazer a correção de encargos negativos. Os valores finais são os valores corrigidos.</p>
-        {% endif %}
         <h4>Encargos e tarifas finais</h4>
+        {% if corrigido_nodal %}
+        <h4>(Após a eliminação de alocações negativas)</h4>
+        {% endif %}
         <div class="tabela">
             <div class="tabela-cabecalho tabela-linha">
                 <div class="tabela-celula">Barra</div>
@@ -221,8 +221,10 @@
             </div>
         </div>
     </div>
+    {% if corrigido_zonal %}
     <div class="conteudo">
         <h4>Tarifas Totais das Zonas</h4>
+        <h4>(Antes da eliminação de alocações negativas)</h4>
         <div class="tabela">
             <div class="tabela-cabecalho tabela-linha">
                 <div class="tabela-celula">Zona</div>
@@ -249,13 +251,16 @@
             </div>
         </div>
     </div>
-    {% if corrigido_zonal %}
-        <div class="conteudo">
-            <p>Para esse cenário operativo, foi necessário fazer a correção de encargos negativos. Os valores finais são os valores corrigidos.</p>
-        </div>
     {% endif %}
+
     <div class="conteudo">
+        {% if corrigido_zonal %}
         <h4>Tarifas Finais das Zonas</h4>
+        <h4>(Após a eliminação de alocações negativas)</h4>
+       {% endif %}
+       {% if not corrigido_zonal %}
+        <h4>Tarifas Totais / Finais das Zonas</h4>
+       {% endif %}
         <div class="tabela">
             <div class="tabela-cabecalho tabela-linha">
                 <div class="tabela-celula">Zona</div>

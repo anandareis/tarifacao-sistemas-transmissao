@@ -6,6 +6,7 @@ class TarifasNodais:
     def __init__(self, sistema, proporcao_geracao):
         self.ro = (100-proporcao_geracao) / proporcao_geracao
         self.sistema = sistema
+        self.corrigido = False
         self.calcular_tarifas_nodais()
         self.gerar_grafico_tarifas()
 
@@ -57,6 +58,8 @@ class TarifasNodais:
 
     # Corrigir alocação negativa nos circuitos
     def corrigir_alocacao_negativa(self, valores, natureza):
+        if any(valores  < 0):
+            self.corrigido = True
         referencia_proporcao = self.sistema.barras.vetor_potencia_gerada() if natureza == 'geracao' else self.sistema.barras.vetor_potencia_consumida()
         valores_corrigidos = distribuir_valores_negativos(valores, referencia_proporcao)
         for barra in self.sistema.barras:

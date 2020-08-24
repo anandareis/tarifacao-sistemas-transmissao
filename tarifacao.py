@@ -68,6 +68,8 @@ saida = template.render(
     barras=sistema.barras,
     circuitos=sistema.circuitos,
     zonas = tarifacao_zonal.zonas,
+    corrigido_nodal = tarifacao_nodal.corrigido,
+    corrigido_zonal = tarifacao_zonal.corrigido,
     f = formatar_decimal
     )
 
