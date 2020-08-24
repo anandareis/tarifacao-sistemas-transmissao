@@ -43,13 +43,16 @@ class TarifasZonais:
     def definir_zonas(self, n_zonas):
         zonas = KMeans(n_clusters=n_zonas).fit_predict(self.sistema.barras.vetor_tarifas('geracao', 'locacional_nodal').reshape(-1, 1))
         for i in range(n_zonas):
-            zona = Zona(numero=i+1, cor=cores[i])
+            zona = Zona()
             for barra in self.sistema.barras :
                 if zonas[barra.posicao] == i:
                     zona.barras.adicionar_barra(barra)
                     barra.zona = zona
             zona.definir_tipo()
             self.zonas.append(zona)
+        self.zonas.sort(key=lambda x: min(x.barras.vetor_tarifas('geracao', 'locacional_nodal')))
+        for i in range(n_zonas):
+            self.zonas[i].configurar(numero=i+1, cor=cores[i])
 
     def cotovelo(self):
         plt.clf()

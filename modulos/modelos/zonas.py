@@ -3,12 +3,17 @@ from modulos.modelos.barras import Barras
 from modulos.utils import dividir as d
 
 class Zona:
-    def __init__(self, numero, cor):
-        self.numero = numero
+    def __init__(self):
+        self.numero = 0
         self.barras = Barras()
+        self.cor = ''
+        self.posicao = 0
+        self.tipo = ''
+
+    def configurar(self, numero, cor):
+        self.numero = numero
         self.cor = cor
         self.posicao = numero - 1
-        self.tipo = ''
 
     def definir_tipo(self):
         tipos = self.barras.vetor_tipos()
