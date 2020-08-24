@@ -33,11 +33,10 @@ class Custos:
 
     def _atualizar_total(self, natureza, tipo):
         base = self._valores_geracao if natureza == 'geracao' else self._valores_carga
-        tarifa = base[f'locacional_{tipo}'].tarifa + base['selo'].tarifa
         encargo = base[f'locacional_{tipo}'].encargo + base['selo'].encargo
-        base[f'total_{tipo}'] = Custo(tarifa, encargo)
+        self.atualizar_encargo(encargo, natureza, f'total_{tipo}', False)
 
-    def atualizar_encargo(self, valor, natureza, tipo):
+    def atualizar_encargo(self, valor, natureza, tipo, atualizar_totais=True):
         if natureza not in ['geracao', 'carga'] or tipo not in self._valores_geracao:
             raise TypeError('Natureza ou tipo do custo não existe.')
         if natureza == 'geracao':
@@ -51,7 +50,8 @@ class Custos:
             if tipo == 'locacional_nodal':
                 referencia = -referencia
         base[tipo] = Custo(d(valor, referencia), valor)
-        self._atualizar_totais()
+        if atualizar_totais:
+            self._atualizar_totais()
 
     def atualizar_tarifa(self, valor, natureza, tipo):
         if natureza not in ['geracao', 'carga'] or tipo not in self._valores_geracao:
