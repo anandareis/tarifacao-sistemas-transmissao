@@ -41,7 +41,7 @@ class TarifasZonais:
                 barra.custos.atualizar_tarifa(tarifa_carga, 'carga', 'locacional_zonal')
 
     def definir_zonas(self, n_zonas):
-        zonas = KMeans(n_clusters=n_zonas).fit_predict(self.sistema.barras.vetor_tarifas('geracao', 'locacional_nodal').reshape(-1, 1))
+        zonas = KMeans(n_clusters=n_zonas, max_iter=1000, random_state=0).fit_predict(self.sistema.barras.vetor_tarifas('geracao', 'locacional_nodal').reshape(-1, 1))
         for i in range(n_zonas):
             zona = Zona()
             for barra in self.sistema.barras :
