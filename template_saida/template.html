@@ -73,6 +73,21 @@
         <p>Para carga, <strong>kc = {{ f(barras.obter_barra(1).custos.obter_tarifa('carga', 'selo'), 3) }}</strong></p>
     </div>
     <div class="conteudo">
+        <h4>Tarifas locacionais</h4>
+        <div class="tabela menor">
+            <div class="tabela-cabecalho tabela-linha">
+                <div class="tabela-celula">Barra</div>
+                <div class="tabela-celula">Tarifa Locacional</div>
+            </div>
+            {% for barra in barras %}
+            <div class="tabela-linha">
+                <div class="tabela-celula">{{ barra.numero }}</div>
+                <div class="tabela-celula">{{ f(barra.custos.obter_tarifa('geracao', 'locacional_nodal'), 3) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="conteudo">
         <h4>Dados de Geração</h4>
         <div class="tabela">
             <div class="tabela-cabecalho tabela-linha">

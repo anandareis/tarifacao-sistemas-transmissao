@@ -30,6 +30,7 @@ img{
 .tabela{
     border-top: 2px solid black;
     border-bottom: 2px solid black;
+    margin: 0 auto;
 }
 
 .tabela-cabecalho {
@@ -45,6 +46,10 @@ img{
 .tabela-linha{
     display: flex;
     justify-content: stretch;
+}
+
+.menor{
+    width: 50%;
 }
 
 .tabela-celula{
