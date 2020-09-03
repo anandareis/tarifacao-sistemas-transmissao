@@ -31,36 +31,30 @@ class Sistema:
             matriz[circuito.posicao, circuito.destino.posicao] = -1
         return matriz
 
-    # Matriz B' completa - mudar o nome da função depois
-    def construir_matriz_b_linha_completa(self):
-        tamanho = len(self.barras)
-        matriz = numpy.zeros((tamanho, tamanho))
-        for circuito in self.circuitos:
-            matriz[circuito.origem.posicao, circuito.destino.posicao] = -circuito.susceptancia
-            matriz[circuito.destino.posicao, circuito.origem.posicao] = -circuito.susceptancia
-
-        for i in range(0, len(matriz)):
-            matriz[i,i] = -numpy.sum(matriz[i])
-
-        return matriz
-
-    # Matriz B' sem a barra de referência
-    def construir_matriz_b_linha(self):
-        matriz = self.construir_matriz_b_linha_completa()
-        matriz = numpy.delete(matriz, self.barras.barra_referencia.posicao, axis=0)
-        matriz = numpy.delete(matriz, self.barras.barra_referencia.posicao, axis=1)
-        return matriz
-
-    # Inversa da matriz B' sem a barra de referência
-    def construir_inversa_b_linha(self):
-        return numpy.linalg.inv(self.construir_matriz_b_linha())
-
-    # Matriz X - inversa com 0 na linha e coluna da barra de referência
+    # Matriz X
     def construir_matriz_x(self):
-        matriz = self.construir_inversa_b_linha()
-        matriz = numpy.insert(matriz, self.barras.barra_referencia.posicao, 0, axis=0)
-        matriz = numpy.insert(matriz, self.barras.barra_referencia.posicao, 0, axis=1)
-        return matriz
+        # Definir tamanho da matriz
+        tamanho = len(self.barras)
+
+        # Criar a matriz completa
+        b_linha = numpy.zeros((tamanho, tamanho))
+        for circuito in self.circuitos:
+            b_linha[circuito.origem.posicao, circuito.destino.posicao] = -circuito.susceptancia
+            b_linha[circuito.destino.posicao, circuito.origem.posicao] = -circuito.susceptancia
+        for i in range(0, len(b_linha)):
+            b_linha[i,i] = -numpy.sum(b_linha[i])
+
+        # Remover linha e coluna da barra de referência
+        b_linha = numpy.delete(b_linha, self.barras.barra_referencia.posicao, axis=0)
+        b_linha = numpy.delete(b_linha, self.barras.barra_referencia.posicao, axis=1)
+
+        # Inverter a matriz
+        matriz_x = numpy.linalg.inv(b_linha)
+
+        # Preencher os valores de linha e coluna da referência com zerro
+        matriz_x = numpy.insert(matriz_x, self.barras.barra_referencia.posicao, 0, axis=0)
+        matriz_x = numpy.insert(matriz_x, self.barras.barra_referencia.posicao, 0, axis=1)
+        return matriz_x
 
     # Matriz beta
     def construir_matriz_beta(self):
