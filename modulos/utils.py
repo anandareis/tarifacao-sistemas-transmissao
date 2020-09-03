@@ -24,16 +24,16 @@ def distribuir_valores_negativos(valores, referencia):
         else:
             return valores_corrigidos
 
-cores = [
+CORES = [
     "#FF0000",
     "#00008B",
     "#FFD700",
     "#008000",
     "#1E90FF",
     "#8B4513",
-    "#6B8E23",
+    "#9ACD32",
     "#008B8B",
-    "#FF4500",
+    "#FF8C00",
     "#BDB76B",
     "#696969",
     "#C71585",

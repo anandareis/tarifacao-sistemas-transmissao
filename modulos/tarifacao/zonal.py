@@ -7,7 +7,7 @@ from sympy import Symbol, lambdify
 
 from modulos.modelos.zonas import Zona
 from modulos.utils import dividir as d
-from modulos.utils import distribuir_valores_negativos, cores
+from modulos.utils import distribuir_valores_negativos, CORES
 
 class TarifasZonais:
     def __init__(self, sistema):
@@ -52,7 +52,7 @@ class TarifasZonais:
             self.zonas.append(zona)
         self.zonas.sort(key=lambda x: min(x.barras.vetor_tarifas('geracao', 'locacional_nodal')))
         for i in range(n_zonas):
-            self.zonas[i].configurar(numero=i+1, cor=cores[i])
+            self.zonas[i].configurar(numero=i+1, cor=CORES[i])
 
     def cotovelo(self):
         plt.clf()
