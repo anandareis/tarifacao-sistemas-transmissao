@@ -7,7 +7,7 @@ from modulos.sistema import Sistema
 from modulos.tarifacao.nodal import TarifasNodais
 from modulos.tarifacao.zonal import TarifasZonais
 from modulos.utils import formatar_decimal
-from parser import parser
+from modulos.parser import parser
 
 if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
