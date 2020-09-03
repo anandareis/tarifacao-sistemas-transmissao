@@ -25,6 +25,12 @@ class Zona:
     def encargo_total(self, natureza):
         return numpy.sum([barra.custos.obter_encargo(natureza, 'total_zonal') for barra in self.barras])
 
+    def tarifa_total(self, natureza):
+        for barra in self.barras:
+            if barra.custos.obter_tarifa(natureza, 'total_zonal') != 0:
+                return barra.custos.obter_tarifa(natureza, 'total_zonal')
+        return 0
+
     def obter_valor_referencia(self, natureza):
         return numpy.sum(self.barras.vetor_capacidade_instalada()) if natureza == 'geracao' else numpy.sum(self.barras.vetor_potencia_consumida())
 

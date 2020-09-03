@@ -251,10 +251,10 @@
             {% for zona in zonas %}
             <div class="tabela-linha">
                 <div class="tabela-celula">{{ zona.numero }}</div>
-                <div class="tabela-celula">{{ f(zona.barras.vetor_encargos('geracao', 'total_zonal') | sum, tratar_zero=True) }}</div>
-                <div class="tabela-celula">{{ f(zona.barras.obter_barra(0).custos.obter_tarifa('geracao', 'total_zonal'), 3, tratar_zero=True) }}</div>
-                <div class="tabela-celula">{{ f(zona.barras.vetor_encargos('carga', 'total_zonal') | sum, tratar_zero=True) }}</div>
-                <div class="tabela-celula">{{ f(zona.barras.obter_barra(0).custos.obter_tarifa('carga', 'total_zonal'), 3, tratar_zero=True) }}</div>
+                <div class="tabela-celula">{{ f(zona.encargo_total('geracao'), tratar_zero=True) }}</div>
+                <div class="tabela-celula">{{ f(zona.tarifa_total('geracao'), 3, tratar_zero=True) }}</div>
+                <div class="tabela-celula">{{ f(zona.encargo_total('carga'), tratar_zero=True) }}</div>
+                <div class="tabela-celula">{{ f(zona.tarifa_total('carga'), 3, tratar_zero=True) }}</div>
             </div>
             {% endfor %}
             <div class="tabela-totais tabela-linha">
